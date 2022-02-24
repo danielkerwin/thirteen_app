@@ -22,7 +22,7 @@ class Game with ChangeNotifier {
     return {..._selectedCardsInHand};
   }
 
-  set cards(List<GameCard> cards) {
+  set cardsInHand(List<GameCard> cards) {
     _cardsInHand = cards;
     notifyListeners();
   }

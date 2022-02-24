@@ -9,6 +9,8 @@ import '../providers/ui.provider.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/game_hand.dart';
 import '../widgets/game_table.dart';
+import '../widgets/game_opponents.dart';
+import '../widgets/game_user.dart';
 import '../widgets/side_drawer.dart';
 
 class GameScreen extends StatelessWidget {
@@ -49,6 +51,7 @@ class GameScreen extends StatelessWidget {
         ],
       ),
       body: Container(
+        padding: const EdgeInsets.all(4.0),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -61,32 +64,24 @@ class GameScreen extends StatelessWidget {
         ),
         child: Column(
           children: [
+            const GameOpponents(),
+            const SizedBox(
+              height: 10,
+            ),
             Expanded(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('Player 3...'),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Player 2...'),
-                        Consumer<Game>(
-                          builder: (_, game, __) => GameTable(
-                            cards: game.cardsOnTable,
-                          ),
-                        ),
-                        const Text('Player 4...'),
-                      ],
-                    ),
-                  ),
-                ],
+              child: Consumer<Game>(
+                builder: (_, game, __) => GameTable(
+                  cards: game.cardsOnTable,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Consumer<Game>(
+              builder: (_, game, __) => GameUser(
+                username: 'Daniel',
+                cards: game.cardsInHand.length,
               ),
             ),
             SizedBox(

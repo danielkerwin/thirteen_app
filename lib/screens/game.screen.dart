@@ -127,18 +127,49 @@ class _GameScreenState extends State<GameScreen> {
           children: _buildCardsLayout(),
         ),
       ),
-      persistentFooterButtons: [
-        IconButton(
-          onPressed: null,
-          icon: const Icon(Icons.shuffle),
-          color: Theme.of(context).primaryColor,
-        ),
-        IconButton(
-          onPressed: _sortCards,
-          icon: const Icon(Icons.swipe),
-          color: Theme.of(context).primaryColor,
-        )
-      ],
+      floatingActionButton: IconButton(
+        onPressed: _sortCards,
+        icon: const Icon(Icons.swipe),
+        color: Theme.of(context).primaryColor,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
+      // persistentFooterButtons: [
+      //   IconButton(
+      //     onPressed: null,
+      //     icon: const Icon(Icons.shuffle),
+      //     color: Theme.of(context).primaryColor,
+      //   ),
+      //   IconButton(
+      //     onPressed: _sortCards,
+      //     icon: const Icon(Icons.swipe),
+      //     color: Theme.of(context).primaryColor,
+      //   )
+      // ],
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: null,
+        backgroundColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Theme.of(context).primaryColorLight,
+        selectedItemColor: Theme.of(context).colorScheme.onSecondary,
+        currentIndex: 0,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            // backgroundColor: Theme.of(context).primaryColor,
+            icon: Icon(Icons.gamepad),
+            label: 'Current game',
+          ),
+          BottomNavigationBarItem(
+            // backgroundColor: Theme.of(context).primaryColor,
+            icon: Icon(Icons.history),
+            label: 'Games list',
+          ),
+          BottomNavigationBarItem(
+            // backgroundColor: Theme.of(context).primaryColor,
+            icon: Icon(Icons.score),
+            label: 'Scoreboard',
+          ),
+        ],
+      ),
     );
   }
 }

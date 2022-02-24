@@ -62,7 +62,10 @@ class GameCardItem extends StatelessWidget {
               child: Text(
                 label,
                 style: TextStyle(
-                    color: color, fontSize: 100, fontWeight: FontWeight.bold),
+                  color: color,
+                  fontSize: 100,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Row(

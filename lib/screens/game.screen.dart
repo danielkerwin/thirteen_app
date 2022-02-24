@@ -20,13 +20,17 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   List<GameCard> _cards = [];
+  List<String> _selectedCardIds = [];
 
   @override
   void initState() {
     super.initState();
-    // pick 13 cards
+    _cards = _generateHand();
+  }
+
+  List<GameCard> _generateHand() {
     final cardsToPickFrom = [...widget.cards];
-    _cards = List.generate(13, (idx) {
+    return List.generate(13, (idx) {
       final random = Random();
       final randomIndex = random.nextInt(cardsToPickFrom.length);
       final pickedCard = cardsToPickFrom[randomIndex];
@@ -36,30 +40,46 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _sortCards() {
-    _cards.sort((a, b) => a.value - b.value);
-    setState(() {});
+    setState(() {
+      _cards.sort((a, b) => a.value - b.value);
+    });
   }
 
   void _shuffleCards() {
-    final cardsToShuffle = [...widget.cards];
-    _cards = cardsToShuffle..shuffle();
+    setState(() {
+      _cards = _generateHand();
+    });
   }
 
-  Widget _buildCard(
-    GameCard pickedCard,
-    double left,
-    double bottom,
-    double rotation,
-  ) {
+  void _selectCard(String id) {
+    print('selecting $id');
+    final idx = _selectedCardIds.indexOf(id);
+    print('index is $idx');
+    if (idx > -1) {
+      _selectedCardIds.removeAt(idx);
+    } else {
+      _selectedCardIds.insert(0, id);
+    }
+    setState(() {});
+  }
+
+  Widget _buildCard({
+    required GameCard pickedCard,
+    required double left,
+    required double bottom,
+    required double rotation,
+    bool isSelected = false,
+  }) {
     return Positioned(
       left: left,
-      bottom: bottom,
+      bottom: isSelected ? bottom + 50 : bottom,
       child: Transform(
         origin: const Offset(65, 100),
         transform: Matrix4.rotationZ(rotation),
         child: GestureDetector(
-          onTap: () => print(pickedCard.label),
+          onTap: () => _selectCard(pickedCard.id),
           child: GameCardItem(
+            key: ValueKey(pickedCard.id),
             label: pickedCard.label,
             color: pickedCard.color,
             icon: pickedCard.icon,
@@ -85,14 +105,17 @@ class _GameScreenState extends State<GameScreen> {
     var bottom = rotation == Orientation.landscape ? -100.0 : 20.0;
     const bottomModifier = 3.5;
 
+    const selectedIndex = 3;
+
     return List.generate(total, (index) {
       final isHalfWay = index >= total / 2;
       bottom = isHalfWay ? bottom - bottomModifier : bottom + bottomModifier;
       return _buildCard(
-        _cards[index],
-        leftStart + (index * leftModifier),
-        bottom,
-        rotationStart + (index * rotationModifier),
+        pickedCard: _cards[index],
+        left: leftStart + (index * leftModifier),
+        bottom: bottom,
+        rotation: rotationStart + (index * rotationModifier),
+        isSelected: _selectedCardIds.contains(_cards[index].id),
       );
     });
   }
@@ -107,8 +130,14 @@ class _GameScreenState extends State<GameScreen> {
         title: const Text('Game'),
         leading: IconButton(
           icon: Icon(ui.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-          onPressed: () => ui.toggleDarkMode(),
+          onPressed: ui.toggleDarkMode,
         ),
+        actions: [
+          IconButton(
+            onPressed: _shuffleCards,
+            icon: const Icon(Icons.shuffle),
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(

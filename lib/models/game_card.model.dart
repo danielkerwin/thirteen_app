@@ -32,14 +32,17 @@ class GameCard extends GameCardValue {
   final GameCardSuit suit;
   final Color color;
   final IconData icon;
+  late String id;
 
-  const GameCard({
+  GameCard({
     label,
     value,
     required this.suit,
     required this.color,
     required this.icon,
-  }) : super(label: label, value: value);
+  }) : super(label: label, value: value) {
+    id = '${suit}_$value';
+  }
 }
 
 final gameCards = [

@@ -1,0 +1,1 @@
+const nanoidCharacters = '26T198340PX75JACKVERYMINDBUSHWOLFGQZ';

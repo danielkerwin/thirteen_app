@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/tab_item.model.dart';
+import 'create_game.screen.dart';
 import 'games.screen.dart';
 import 'scoreboard.screen.dart';
 import 'settings.screen.dart';
@@ -25,6 +26,10 @@ class _TabsScreenState extends State<TabsScreen> {
     setState(() => _selectedIndex = index);
   }
 
+  _createGame() {
+    Navigator.of(context).pushNamed(CreateGameScreen.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -37,7 +42,7 @@ class _TabsScreenState extends State<TabsScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {},
+            onPressed: _createGame,
           ),
         ],
       ),
@@ -46,7 +51,7 @@ class _TabsScreenState extends State<TabsScreen> {
           ? FloatingActionButton(
               tooltip: 'Create a Game',
               child: const Icon(Icons.add),
-              onPressed: () {},
+              onPressed: _createGame,
             )
           : null,
       bottomNavigationBar: BottomNavigationBar(

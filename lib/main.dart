@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'providers/game.provider.dart';
 import 'providers/ui.provider.dart';
 import 'screens/auth.screen.dart';
+import 'screens/create_game.screen.dart';
 import 'screens/game.screen.dart';
 import 'screens/games.screen.dart';
 import 'screens/scoreboard.screen.dart';
@@ -45,8 +46,9 @@ class MyApp extends StatelessWidget {
                 theme: ui.isDarkMode ? darkTheme : lightTheme,
                 home: user.hasData ? const TabsScreen() : const AuthScreen(),
                 routes: {
-                  GameScreen.routeName: (ctx) => const GameScreen(),
                   GamesScreen.routeName: (ctx) => const GamesScreen(),
+                  GameScreen.routeName: (ctx) => const GameScreen(),
+                  CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
                   ScoreboardScreen.routeName: (ctx) => const ScoreboardScreen(),
                   SettingsScreen.routeName: (ctx) => const SettingsScreen(),
                 },

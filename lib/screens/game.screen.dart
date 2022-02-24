@@ -8,6 +8,7 @@ import '../providers/ui.provider.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/game_hand.dart';
 import '../widgets/game_table.dart';
+import '../widgets/side_drawer.dart';
 
 class GameScreen extends StatelessWidget {
   const GameScreen({
@@ -94,6 +95,9 @@ class GameScreen extends StatelessWidget {
         color: theme.colorScheme.secondary,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
+      drawer: mediaQuery.orientation == Orientation.portrait
+          ? null
+          : const SideDrawer(),
       bottomNavigationBar: mediaQuery.orientation == Orientation.portrait
           ? const BottomNav()
           : null,

@@ -65,16 +65,31 @@ class GameCardItem extends StatelessWidget {
                 ),
               ],
             ),
-            Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 80,
-                  fontWeight: FontWeight.bold,
-                ),
+            Expanded(
+              child: Stack(
+                children: [
+                  Center(
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 80,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: -25,
+                    child: FaIcon(
+                      icon,
+                      color: color.withOpacity(0.3),
+                      size: 150,
+                    ),
+                  ),
+                ],
               ),
-            ),
+            )
           ],
         ),
       ),

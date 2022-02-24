@@ -9,13 +9,16 @@ class GameTable extends StatelessWidget {
 
   List<Widget> _buildTable(BoxConstraints constraints) {
     double offset = 0.0;
+    var modifier = (constraints.maxWidth - 50) / cards.length;
     return cards.map(
       (card) {
         final widget = Positioned(
-          left: offset * 13,
+          left: 0 + (modifier * offset),
           child: Transform(
             origin: const Offset(65, 100),
-            transform: Matrix4.rotationZ(-0.6 + offset / 7)..scale(0.7),
+            transform: Matrix4.rotationZ(-0.6 + offset / cards.length)
+              ..scale(0.7)
+              ..translate(1.5),
             child: GameCardItem(
               label: card.label,
               color: card.color,
@@ -32,13 +35,15 @@ class GameTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final theme = Theme.of(context);
     print('building game_table');
     return Container(
-      width: mediaQuery.size.width * 0.5,
+      width: mediaQuery.size.width * 0.7,
       height: mediaQuery.size.height / 2 * 0.5,
       decoration: BoxDecoration(
+        color: theme.colorScheme.secondary.withOpacity(0.1),
         border: Border.all(
-          color: Theme.of(context).colorScheme.secondary,
+          color: theme.colorScheme.secondary,
           width: 0.5,
         ),
         borderRadius: const BorderRadius.only(
@@ -48,7 +53,7 @@ class GameTable extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (ctx, contraints) => Stack(
-          fit: StackFit.passthrough,
+          alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: _buildTable(contraints),
         ),

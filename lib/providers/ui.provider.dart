@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class UI extends ChangeNotifier {
-  bool _isDarkMode = true;
+  bool _isDarkMode = false;
 
   get isDarkMode {
     return _isDarkMode;

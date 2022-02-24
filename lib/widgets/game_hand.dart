@@ -85,10 +85,14 @@ class GameHand extends StatelessWidget {
         child: ElevatedButton(
           child: Text(message),
           onPressed: Provider.of<Game>(context, listen: false).generateNewCards,
+          style: ElevatedButton.styleFrom(
+            primary: Theme.of(context).colorScheme.secondary,
+          ),
         ),
       );
     }
     return Stack(
+      clipBehavior: Clip.none,
       children: _buildCardsLayout(
         context,
         mediaQuery,

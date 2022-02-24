@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/game_card.model.dart';
 import '../providers/game.provider.dart';
 import '../providers/ui.provider.dart';
+import '../widgets/bottom_nav.dart';
 import '../widgets/game_hand.dart';
 import '../widgets/game_table.dart';
 
@@ -26,15 +27,15 @@ class GameScreen extends StatelessWidget {
     final ui = Provider.of<UI>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Game'),
-        leading: IconButton(
-          icon: Icon(ui.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-          onPressed: ui.toggleDarkMode,
-        ),
+        title: const Text('Thirteen!'),
         actions: [
           IconButton(
             onPressed: () => _shuffleCards(context),
             icon: const Icon(Icons.shuffle),
+          ),
+          IconButton(
+            icon: Icon(ui.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: ui.toggleDarkMode,
           ),
         ],
       ),
@@ -45,7 +46,7 @@ class GameScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               theme.primaryColor.withOpacity(0),
-              theme.primaryColorLight,
+              theme.primaryColor.withOpacity(0.5),
             ],
           ),
         ),
@@ -89,32 +90,13 @@ class GameScreen extends StatelessWidget {
       ),
       floatingActionButton: IconButton(
         onPressed: Provider.of<Game>(context, listen: false).sortCards,
-        icon: const Icon(Icons.swipe),
-        color: Theme.of(context).primaryColor,
+        icon: const Icon(Icons.sort),
+        color: theme.colorScheme.secondary,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: null,
-        backgroundColor: theme.primaryColor,
-        unselectedItemColor: theme.primaryColorLight,
-        selectedItemColor: theme.colorScheme.onSecondary,
-        currentIndex: 0,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.gamepad),
-            label: 'Current game',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Games list',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.score),
-            label: 'Scoreboard',
-          ),
-        ],
-      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
+      bottomNavigationBar: mediaQuery.orientation == Orientation.portrait
+          ? const BottomNav()
+          : null,
     );
   }
 }

@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
         builder: (_, ui, __) {
           print('rebuilding');
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'Thirteen',
             theme: ui.isDarkMode ? darkTheme : lightTheme,
             home: const GameScreen(),

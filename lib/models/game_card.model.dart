@@ -41,7 +41,7 @@ class GameCard extends GameCardValue {
     required this.color,
     required this.icon,
   }) : super(label: label, value: value) {
-    id = '${suit}_$value';
+    id = '${suit.index}_$value';
   }
 }
 

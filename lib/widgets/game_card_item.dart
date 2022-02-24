@@ -68,19 +68,6 @@ class GameCardItem extends StatelessWidget {
                 ),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 20,
-                  ),
-                )
-              ],
-            )
           ],
         ),
       ),

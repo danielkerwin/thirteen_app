@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import '../models/game_card.model.dart';
@@ -7,9 +9,10 @@ class GameTable extends StatelessWidget {
   final List<GameCard> cards;
   const GameTable({Key? key, required this.cards}) : super(key: key);
 
-  List<Widget> _buildTable(BoxConstraints constraints) {
+  List<Widget> _buildTable(
+      BoxConstraints constraints, MediaQueryData mediaQuery) {
     double offset = 0.0;
-    var modifier = (constraints.maxWidth - 50) / cards.length;
+    var modifier = (constraints.maxWidth - 100) / max(5, cards.length);
     return cards.map(
       (card) {
         final widget = Positioned(
@@ -17,7 +20,9 @@ class GameTable extends StatelessWidget {
           child: Transform(
             origin: const Offset(65, 100),
             transform: Matrix4.rotationZ(-0.6 + offset / cards.length)
-              ..scale(0.7)
+              ..scale(
+                mediaQuery.orientation == Orientation.portrait ? 0.7 : 0.5,
+              )
               ..translate(1.5),
             child: GameCardItem(
               label: card.label,
@@ -38,13 +43,22 @@ class GameTable extends StatelessWidget {
     final theme = Theme.of(context);
     print('building game_table');
     return Container(
-      width: mediaQuery.size.width * 0.7,
+      width: mediaQuery.size.width * 0.6,
       height: mediaQuery.size.height / 2 * 0.5,
+      constraints: const BoxConstraints(maxWidth: 500),
       decoration: BoxDecoration(
         color: theme.colorScheme.secondary.withOpacity(0.1),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            theme.colorScheme.secondary,
+            theme.colorScheme.secondary.withOpacity(0)
+          ],
+        ),
         border: Border.all(
           color: theme.colorScheme.secondary,
-          width: 0.5,
+          width: 0.7,
         ),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
@@ -55,7 +69,7 @@ class GameTable extends StatelessWidget {
         builder: (ctx, contraints) => Stack(
           alignment: Alignment.center,
           clipBehavior: Clip.none,
-          children: _buildTable(contraints),
+          children: _buildTable(contraints, mediaQuery),
         ),
       ),
     );

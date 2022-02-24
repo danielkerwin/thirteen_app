@@ -32,6 +32,7 @@ class GameHand extends StatelessWidget {
             label: pickedCard.label,
             color: pickedCard.color,
             icon: pickedCard.icon,
+            isSelected: isSelected,
           ),
         ),
       ),

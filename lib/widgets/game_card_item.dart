@@ -5,27 +5,30 @@ class GameCardItem extends StatelessWidget {
   final String label;
   final Color color;
   final IconData icon;
+  final bool isSelected;
 
   const GameCardItem({
     Key? key,
     required this.label,
     required this.color,
     required this.icon,
+    this.isSelected = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(1.0),
-      // width: 130,
-      // height: 200,
       constraints: const BoxConstraints(maxHeight: 200, maxWidth: 130),
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(
           Radius.circular(15.0),
         ),
         color: color,
-        border: Border.all(color: Colors.white, width: 0.5),
+        border: Border.all(
+          color: Colors.white,
+          width: 0.5,
+        ),
         boxShadow: const [
           BoxShadow(blurRadius: 1.0),
         ],
@@ -36,8 +39,6 @@ class GameCardItem extends StatelessWidget {
         child: Column(
           children: [
             Row(
-              // mainAxisAlignment: MainAxisAlignment.start,
-              // crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.only(left: 3.0),

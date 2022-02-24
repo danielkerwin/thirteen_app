@@ -10,7 +10,9 @@ class GameTable extends StatelessWidget {
   const GameTable({Key? key, required this.cards}) : super(key: key);
 
   List<Widget> _buildTable(
-      BoxConstraints constraints, MediaQueryData mediaQuery) {
+    BoxConstraints constraints,
+    MediaQueryData mediaQuery,
+  ) {
     double offset = 0.0;
     var modifier = (constraints.maxWidth - 100) / max(5, cards.length);
     return cards.map(

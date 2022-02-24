@@ -1,17 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/game.provider.dart';
-import '../providers/ui.provider.dart';
-import '../widgets/main_bottom_nav.dart';
 import '../widgets/game_hand.dart';
 import '../widgets/game_table.dart';
 import '../widgets/game_opponents.dart';
 import '../widgets/game_user.dart';
-import '../widgets/main_drawer.dart';
 
 class GameScreen extends StatelessWidget {
+  static const routeName = '/game';
   const GameScreen({
     Key? key,
   }) : super(key: key);
@@ -25,26 +22,9 @@ class GameScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Thirteen!',
+          'Playing Thirteen!',
           style: TextStyle(fontFamily: 'LuckiestGuy'),
         ),
-        actions: [
-          IconButton(
-            onPressed:
-                Provider.of<Game>(context, listen: false).generateNewCards,
-            icon: const Icon(Icons.shuffle),
-          ),
-          Consumer<UI>(
-            builder: (_, ui, __) => IconButton(
-              icon: Icon(ui.isDarkMode ? Icons.light_mode : Icons.dark_mode),
-              onPressed: ui.toggleDarkMode,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            onPressed: FirebaseAuth.instance.signOut,
-          ),
-        ],
       ),
       body: Container(
         padding: const EdgeInsets.all(4.0),
@@ -100,12 +80,6 @@ class GameScreen extends StatelessWidget {
         color: theme.colorScheme.secondary,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniStartFloat,
-      drawer: mediaQuery.orientation == Orientation.portrait
-          ? null
-          : const MainDrawer(),
-      bottomNavigationBar: mediaQuery.orientation == Orientation.portrait
-          ? const MainBottomNav()
-          : null,
     );
   }
 }

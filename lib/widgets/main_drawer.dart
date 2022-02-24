@@ -12,9 +12,9 @@ class MainDrawer extends StatelessWidget {
             automaticallyImplyLeading: false,
             title: const Text('Thirteen!'),
           ),
-          ListTile(),
-          ListTile(),
-          ListTile(),
+          const ListTile(),
+          const ListTile(),
+          const ListTile(),
         ],
       ),
     );

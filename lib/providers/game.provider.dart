@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../models/game_card.model.dart';
 
 class Game with ChangeNotifier {
-  String? _id;
+  // String? _id;
   List<GameCard> _cardsInHand = [];
   List<GameCard> _cardsOnTable = [];
   final Set<String> _selectedCardsInHand = {};

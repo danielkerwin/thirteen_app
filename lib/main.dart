@@ -8,6 +8,10 @@ import 'providers/game.provider.dart';
 import 'providers/ui.provider.dart';
 import 'screens/auth.screen.dart';
 import 'screens/game.screen.dart';
+import 'screens/games.screen.dart';
+import 'screens/scoreboard.screen.dart';
+import 'screens/settings.screen.dart';
+import 'screens/tabs.screen.dart';
 import 'themes/dark.theme.dart';
 import 'themes/light.theme.dart';
 
@@ -33,15 +37,22 @@ class MyApp extends StatelessWidget {
         builder: (_, ui, __) {
           print('rebuilding');
           return StreamBuilder<User?>(
-              stream: FirebaseAuth.instance.userChanges(),
-              builder: (context, user) {
-                return MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  title: 'Thirteen',
-                  theme: ui.isDarkMode ? darkTheme : lightTheme,
-                  home: user.hasData ? const GameScreen() : const AuthScreen(),
-                );
-              });
+            stream: FirebaseAuth.instance.userChanges(),
+            builder: (context, user) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Thirteen',
+                theme: ui.isDarkMode ? darkTheme : lightTheme,
+                home: user.hasData ? const TabsScreen() : const AuthScreen(),
+                routes: {
+                  GameScreen.routeName: (ctx) => const GameScreen(),
+                  GamesScreen.routeName: (ctx) => const GamesScreen(),
+                  ScoreboardScreen.routeName: (ctx) => const ScoreboardScreen(),
+                  SettingsScreen.routeName: (ctx) => const SettingsScreen(),
+                },
+              );
+            },
+          );
         },
       ),
     );

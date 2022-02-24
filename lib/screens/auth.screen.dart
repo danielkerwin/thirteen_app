@@ -18,7 +18,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _submitAuthForm(
     String email,
-    String username,
+    String nickname,
     String password,
     bool isLogin,
   ) async {
@@ -40,7 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
             .collection('users')
             .doc(userData.user?.uid)
             .set(
-          {'username': username, 'email': email},
+          {'nickname': nickname, 'email': email, 'createdAt': Timestamp.now()},
         );
       }
     } on FirebaseAuthException catch (err) {

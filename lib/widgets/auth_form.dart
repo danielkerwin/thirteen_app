@@ -24,7 +24,7 @@ class _AuthFormState extends State<AuthForm> {
   var _isLogin = true;
 
   final _emailController = TextEditingController();
-  final _usernameController = TextEditingController();
+  final _nicknameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
 
@@ -38,7 +38,7 @@ class _AuthFormState extends State<AuthForm> {
 
     await widget.onSubmit(
       _emailController.text.trim(),
-      _usernameController.text.trim(),
+      _nicknameController.text.trim(),
       _passwordController.text.trim(),
       _isLogin,
     );
@@ -76,16 +76,16 @@ class _AuthFormState extends State<AuthForm> {
                   ),
                   if (!_isLogin)
                     TextFormField(
-                      controller: _usernameController,
+                      controller: _nicknameController,
                       decoration: const InputDecoration(
-                        labelText: 'Username',
+                        labelText: 'Nickname',
                       ),
                       validator: (val) {
                         if (val == null || val.isEmpty) {
-                          return 'Username is required';
+                          return 'Nickname is required';
                         }
-                        if (val.length < 3) {
-                          return 'Username must have at least 4 characters';
+                        if (val.length < 3 || val.length > 10) {
+                          return 'Nickname must be between 3 to 10 characters';
                         }
                         return null;
                       },

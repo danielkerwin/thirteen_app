@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'base.theme.dart';
+
 final base = ThemeData(
   primarySwatch: Colors.green,
   brightness: Brightness.light,
@@ -7,14 +9,8 @@ final base = ThemeData(
 );
 
 final lightTheme = base.copyWith(
-  // buttonTheme: const ButtonThemeData(buttonColor: Colors.white),
-  elevatedButtonTheme: ElevatedButtonThemeData(
-    style: ElevatedButton.styleFrom(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-    ),
-  ),
+  cardTheme: cardTheme,
+  elevatedButtonTheme: elevatedButtonTheme,
   iconTheme: IconThemeData(color: base.colorScheme.primary),
   colorScheme: base.colorScheme.copyWith(
     secondary: Colors.pink,

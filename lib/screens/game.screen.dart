@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +29,10 @@ class GameScreen extends StatelessWidget {
     final ui = Provider.of<UI>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Thirteen!'),
+        title: const Text(
+          'Thirteen!',
+          style: TextStyle(fontFamily: 'LuckiestGuy'),
+        ),
         actions: [
           IconButton(
             onPressed: () => _shuffleCards(context),
@@ -37,6 +41,10 @@ class GameScreen extends StatelessWidget {
           IconButton(
             icon: Icon(ui.isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: ui.toggleDarkMode,
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout_rounded),
+            onPressed: FirebaseAuth.instance.signOut,
           ),
         ],
       ),

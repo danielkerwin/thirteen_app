@@ -25,17 +25,12 @@ class GameCardItem extends StatelessWidget {
           Radius.circular(15.0),
         ),
         color: color,
-        border: Border.all(color: Colors.white, width: 0.4),
+        border: Border.all(color: Colors.white, width: 0.5),
         boxShadow: const [
           BoxShadow(blurRadius: 1.0),
         ],
       ),
       child: Card(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(
-            Radius.circular(10),
-          ),
-        ),
         elevation: 15,
         color: Colors.grey[350],
         child: Column(

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'firebase_options.dart';
 
 import 'providers/game.provider.dart';
 import 'providers/ui.provider.dart';
+import 'screens/auth.screen.dart';
 import 'screens/game.screen.dart';
 import 'themes/dark.theme.dart';
 import 'themes/light.theme.dart';
@@ -30,12 +32,16 @@ class MyApp extends StatelessWidget {
       child: Consumer<UI>(
         builder: (_, ui, __) {
           print('rebuilding');
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Thirteen',
-            theme: ui.isDarkMode ? darkTheme : lightTheme,
-            home: const GameScreen(),
-          );
+          return StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.userChanges(),
+              builder: (context, user) {
+                return MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  title: 'Thirteen',
+                  theme: ui.isDarkMode ? darkTheme : lightTheme,
+                  home: user.hasData ? const GameScreen() : const AuthScreen(),
+                );
+              });
         },
       ),
     );

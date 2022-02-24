@@ -39,31 +39,21 @@ dependencies:
   cloud_firestore: ^3.1.8
   provider: ^6.0.2
   font_awesome_flutter: '>= 4.7.0'
+  firebase_auth: ^3.3.7
+  json_annotation: ^4.4.0
 
 dependency_overrides:
   font_awesome_flutter:
     path: fa/font_awesome_flutter
 
 dev_dependencies:
+  build_runner: ^2.0.0
+  json_serializable: ^6.0.0
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^1.0.0
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter.
 flutter:
-
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
@@ -88,4 +78,8 @@ flutter:
         - asset: assets/fonts/Roboto-Regular.ttf
         - asset: assets/fonts/Roboto-Bold.ttf
           weight: 700
+
+    - family: LuckiestGuy
+      fonts:
+        - asset: assets/fonts/LuckiestGuy-Regular.ttf
 

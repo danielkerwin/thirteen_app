@@ -3,6 +3,10 @@ PODS:
     - Firebase/Firestore (= 8.11.0)
     - firebase_core
     - Flutter
+  - cloud_functions (3.2.8):
+    - Firebase/Functions (= 8.11.0)
+    - firebase_core
+    - Flutter
   - Firebase/Auth (8.11.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 8.11.0)
@@ -11,6 +15,9 @@ PODS:
   - Firebase/Firestore (8.11.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 8.11.0)
+  - Firebase/Functions (8.11.0):
+    - Firebase/CoreOnly
+    - FirebaseFunctions (~> 8.11.0)
   - firebase_auth (3.3.7):
     - Firebase/Auth (= 8.11.0)
     - firebase_core
@@ -40,6 +47,9 @@ PODS:
   - FirebaseFirestore/Base (8.11.0)
   - FirebaseFirestore/WithLeveldb (8.11.0):
     - FirebaseFirestore/Base
+  - FirebaseFunctions (8.11.0):
+    - FirebaseCore (~> 8.0)
+    - GTMSessionFetcher/Core (~> 1.5)
   - Flutter (1.0.0)
   - GoogleDataTransport (9.1.2):
     - GoogleUtilities/Environment (~> 7.2)
@@ -70,6 +80,7 @@ PODS:
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - FirebaseFirestore (from `https://github.com/invertase/firestore-ios-sdk-frameworks.git`, tag `8.11.0`)
@@ -81,6 +92,7 @@ SPEC REPOS:
     - FirebaseAuth
     - FirebaseCore
     - FirebaseCoreDiagnostics
+    - FirebaseFunctions
     - GoogleDataTransport
     - GoogleUtilities
     - GTMSessionFetcher
@@ -90,6 +102,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
+  cloud_functions:
+    :path: ".symlinks/plugins/cloud_functions/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -107,6 +121,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   cloud_firestore: 8bd22e19f6ccf3a0d1976ea298e0ce37c9ad5839
+  cloud_functions: daee870ef8168bc2c87c6e8950a692baba131ef7
   Firebase: 44dd9724c84df18b486639e874f31436eaa9a20c
   firebase_auth: 20bf788012988ef04ce608fada5b8d8cd1069302
   firebase_core: 443bccfd6aa6b42f07be365b500773dc69db2d87
@@ -114,6 +129,7 @@ SPEC CHECKSUMS:
   FirebaseCore: 2f4f85b453cc8fea4bb2b37e370007d2bcafe3f0
   FirebaseCoreDiagnostics: 3b40dfadef5b90433a60ae01f01e90fe87aa76aa
   FirebaseFirestore: 8a0c6a06219bbaad86c72bcb66688c28995dde84
+  FirebaseFunctions: 2bad3e4365dee72a85a6baa6ccd684f024d14696
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   GoogleDataTransport: 629c20a4d363167143f30ea78320d5a7eb8bd940
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1

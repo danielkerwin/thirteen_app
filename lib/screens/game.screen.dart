@@ -27,93 +27,99 @@ class GameScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Playing Thirteen!',
+          'Thirteen!',
           style: TextStyle(fontFamily: 'LuckiestGuy'),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Text('#$gameId'),
+            ),
+          )
+        ],
       ),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          stream: DatabaseService.getGameStream(gameId),
-          builder: (context, gameSnapshot) {
-            if (gameSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator.adaptive());
-            }
-            if (gameSnapshot.hasError) {
-              return GameError(gameId: gameId);
-            }
-            if (!gameSnapshot.data!.exists) {
-              return GameError(gameId: gameId);
-            }
-            final userId = FirebaseAuth.instance.currentUser?.uid;
-            return Container(
-              padding: const EdgeInsets.all(4.0),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    theme.primaryColor.withOpacity(0),
-                    theme.primaryColor.withOpacity(0.5),
-                  ],
-                ),
-              ),
-              child: Column(
-                children: [
-                  GamePlayers(gameId: gameId, userId: userId as String),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Expanded(
-                    child: Consumer<Game>(
-                      builder: (_, game, __) => GameTable(
-                        cards: game.cardsOnTable,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment:
-                        mediaQuery.orientation == Orientation.portrait
-                            ? MainAxisAlignment.center
-                            : MainAxisAlignment.start,
-                    children: [
-                      StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-                        stream:
-                            DatabaseService.getGamePlayerStream(gameId, userId),
-                        builder: (context, gamePlayerSnapshot) {
-                          if (gamePlayerSnapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator.adaptive(),
-                            );
-                          }
-                          return GameUser(
-                            nickname: 'Me',
-                            cards: gamePlayerSnapshot.data?['cardsCount'],
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                  Center(
-                    child: ElevatedButton(
-                      child: const Text('Start game'),
-                      onPressed: Provider.of<Game>(context, listen: false)
-                          .generateNewCards,
-                      style: ElevatedButton.styleFrom(
-                        primary: Theme.of(context).colorScheme.secondary,
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: handHeight,
-                    child: const GameHand(),
-                  ),
+        stream: DatabaseService.getGameStream(gameId),
+        builder: (context, gameSnapshot) {
+          if (gameSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator.adaptive());
+          }
+          if (gameSnapshot.hasError) {
+            return GameError(gameId: gameId);
+          }
+          if (!gameSnapshot.data!.exists) {
+            return GameError(gameId: gameId);
+          }
+          final userId = FirebaseAuth.instance.currentUser?.uid;
+          final myData = gameSnapshot.data!['players'][userId];
+
+          return Container(
+            padding: const EdgeInsets.all(4.0),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  theme.primaryColor.withOpacity(0),
+                  theme.primaryColor.withOpacity(0.5),
                 ],
               ),
-            );
-          }),
+            ),
+            child: Column(
+              children: [
+                GamePlayers(gameId: gameId, userId: userId!),
+                const SizedBox(
+                  height: 10,
+                ),
+                Expanded(
+                  child: Consumer<Game>(
+                    builder: (_, game, __) => GameTable(
+                      cards: game.cardsOnTable,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment:
+                      mediaQuery.orientation == Orientation.portrait
+                          ? MainAxisAlignment.center
+                          : MainAxisAlignment.start,
+                  children: [
+                    if (myData == null)
+                      ElevatedButton(
+                        child: const Text('Join Game'),
+                        onPressed: () =>
+                            DatabaseService.joinGame(gameId, userId),
+                      )
+                    else
+                      GameUser(
+                        nickname: 'Me',
+                        cards: myData['cardCount'],
+                      ),
+                  ],
+                ),
+                Center(
+                  child: ElevatedButton(
+                    child: const Text('Start game'),
+                    onPressed: Provider.of<Game>(context, listen: false)
+                        .generateNewCards,
+                    style: ElevatedButton.styleFrom(
+                      primary: theme.colorScheme.secondary,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: handHeight,
+                  child: const GameHand(),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
       floatingActionButton: IconButton(
         onPressed: Provider.of<Game>(context, listen: false).sortCards,
         icon: const Icon(Icons.sort),

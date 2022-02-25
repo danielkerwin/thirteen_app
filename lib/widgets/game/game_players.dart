@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/database.service.dart';
@@ -14,14 +13,14 @@ class GamePlayers extends StatelessWidget {
     required this.userId,
   }) : super(key: key);
 
-  List<GameUser> buildPlayers(QuerySnapshot<Map<String, dynamic>> data) {
+  List<GameUser> buildPlayers(Map<String, dynamic> data) {
     final List<GameUser> gameUsers = [];
-    for (var doc in data.docs) {
-      if (doc.id != userId) {
+    for (var doc in data.entries) {
+      if (doc.key != userId) {
         gameUsers.add(
           GameUser(
-            cards: doc['cardsCount'],
-            nickname: doc['nickname'],
+            cards: doc.value['cardCount'],
+            nickname: doc.value['nickname'],
           ),
         );
       }
@@ -31,23 +30,23 @@ class GamePlayers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: DatabaseService.getGamePlayersStream(gameId),
-      builder: (context, gamePlayersSnapshot) {
-        if (gamePlayersSnapshot.connectionState == ConnectionState.waiting) {
+    return StreamBuilder<DocStream>(
+      stream: DatabaseService.getGameStream(gameId),
+      builder: (context, gameSnapshot) {
+        if (gameSnapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator.adaptive(),
           );
         }
-        // if (gamePlayersSnapshot.data!.size == 1) {
-        //   return const Center(
-        //     child: Text('Waiting for players...'),
-        //   );
-        // }
-
+        if (!gameSnapshot.data!.exists) {
+          return const Center(
+            child: Text('Error has occurred - try again later'),
+          );
+        }
+        final data = gameSnapshot.data!.data();
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: buildPlayers(gamePlayersSnapshot.data!),
+          children: buildPlayers(data!['players']),
         );
       },
     );

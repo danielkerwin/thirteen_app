@@ -9,6 +9,7 @@ import 'game.screen.dart';
 
 class GamesScreen extends StatelessWidget {
   static const routeName = '/games';
+
   const GamesScreen({Key? key}) : super(key: key);
 
   Widget _getGameStatus(int statusInt) {
@@ -26,58 +27,61 @@ class GamesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: DatabaseService.getGamesStream(userId!),
-        builder: (context, gamesSnapshot) {
-          if (gamesSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
-          }
-          return ListView.builder(
-            itemCount: gamesSnapshot.data?.docs.length ?? 0,
-            padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-            itemBuilder: (ctx, idx) {
-              final gameId = gamesSnapshot.data?.docs[idx].id;
-              final gameData = gamesSnapshot.data?.docs[idx].data();
-              final status = gameData?['status'];
-              Timestamp timestamp = gameData?['createdAt'];
-              DateTime date = timestamp.toDate();
+    return StreamBuilder<CollectionStream>(
+      stream: DatabaseService.getGamesStream(userId!),
+      builder: (context, gamesSnapshot) {
+        if (gamesSnapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
 
-              return Card(
-                child: Dismissible(
-                  key: ValueKey(gameId),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    DatabaseService.deleteGame(gameId!);
-                  },
-                  background: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
-                    ),
-                    padding: const EdgeInsets.only(right: 16.0),
-                    alignment: Alignment.centerRight,
-                    child: const Icon(
-                      Icons.delete,
-                      color: Colors.white,
+        return ListView.builder(
+          itemCount: gamesSnapshot.data?.docs.length ?? 0,
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+          itemBuilder: (ctx, idx) {
+            final docs = gamesSnapshot.data?.docs;
+            final gameId = docs?[idx].id;
+            final gameData = docs?[idx].data();
+            final status = gameData?['status'];
+            Timestamp timestamp = gameData?['createdAt'];
+            DateTime date = timestamp.toDate();
+
+            return Card(
+              child: Dismissible(
+                key: ValueKey(gameId),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) {
+                  DatabaseService.deleteGame(gameId!);
+                },
+                background: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
                     ),
                   ),
-                  child: ListTile(
-                    title: Text('Game #$gameId'),
-                    subtitle: Text(DateFormat.yMMMd().format(date)),
-                    trailing: _getGameStatus(status as int),
-                    onTap: () => Navigator.of(context).pushNamed(
-                      GameScreen.routeName,
-                      arguments: gameId,
-                    ),
+                  padding: const EdgeInsets.only(right: 16.0),
+                  alignment: Alignment.centerRight,
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.white,
                   ),
                 ),
-              );
-            },
-          );
-        });
+                child: ListTile(
+                  title: Text('Game #$gameId'),
+                  subtitle: Text(DateFormat.yMMMd().format(date)),
+                  trailing: _getGameStatus(status as int),
+                  onTap: () => Navigator.of(context).pushNamed(
+                    GameScreen.routeName,
+                    arguments: gameId,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

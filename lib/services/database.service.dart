@@ -22,17 +22,34 @@ class DatabaseService {
       'createdByName': nickname,
       'status': GameStatus.created.index,
       'playerIds': [userId],
+      'players': {
+        userId: {
+          'cardCount': 0,
+          'nickname': nickname,
+        },
+      },
       'rules': {},
     });
-    final playerPath = '$gamePath/players/$userId';
-    await FirebaseFirestore.instance.doc(playerPath).set({
-      'cardsCount': 0,
-      'nickname': nickname,
-    });
-    // final cardsPath = '$gamePath/cards/$userId';
-    // await FirebaseFirestore.instance.doc(cardsPath).set({
-    //   'cards': [],
-    // });
+  }
+
+  static Future<void> joinGame(
+    String gameId,
+    String userId,
+    // String nickname,
+  ) async {
+    final gamePath = 'games/$gameId';
+    await FirebaseFirestore.instance.doc(gamePath).set(
+      {
+        'playerIds': FieldValue.arrayUnion([userId]),
+        'players': {
+          userId: {
+            'cardCount': 0,
+            'nickname': 'nickname',
+          },
+        },
+      },
+      SetOptions(merge: true),
+    );
   }
 
   static Future<void> deleteGame(String gameId) async {
@@ -51,18 +68,6 @@ class DatabaseService {
     return FirebaseFirestore.instance
         .collection('games')
         .doc(gameId)
-        .snapshots();
-  }
-
-  static Stream<CollectionStream> getGamePlayersStream(String gameId) {
-    return FirebaseFirestore.instance
-        .collection('games/$gameId/players')
-        .snapshots();
-  }
-
-  static Stream<DocStream> getGamePlayerStream(String gameId, String userId) {
-    return FirebaseFirestore.instance
-        .doc('games/$gameId/players/$userId')
         .snapshots();
   }
 }

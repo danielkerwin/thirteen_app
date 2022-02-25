@@ -43,6 +43,7 @@ dependencies:
   json_annotation: ^4.4.0
   nanoid: ^1.0.0
   intl: ^0.17.0
+  cloud_functions: ^3.2.8
 
 dependency_overrides:
   font_awesome_flutter:

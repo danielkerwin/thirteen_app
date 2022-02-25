@@ -30,14 +30,10 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
     final user = FirebaseAuth.instance.currentUser;
     final userData = await FirebaseFirestore.instance
         .collection('users')
-        .doc(user?.uid)
+        .doc(user!.uid)
         .get();
     final gameId = await customAlphabet(nanoidCharacters, 5);
-    await DatabaseService.createGame(
-      gameId,
-      user?.uid ?? '',
-      userData['nickname'],
-    );
+    await DatabaseService.createGame(gameId, user.uid, userData['nickname']);
 
     Navigator.of(context).popAndPushNamed(
       GameScreen.routeName,

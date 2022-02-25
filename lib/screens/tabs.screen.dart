@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/tab_item.model.dart';
 import 'create_game.screen.dart';
+import 'game.screen.dart';
 import 'games.screen.dart';
 import 'scoreboard.screen.dart';
 import 'settings.screen.dart';
@@ -20,14 +21,55 @@ class _TabsScreenState extends State<TabsScreen> {
     const TabItem(screen: SettingsScreen(), title: 'title')
   ];
 
+  final _gameCodeController = TextEditingController();
   int _selectedIndex = 0;
 
   void _selectScreen(BuildContext context, int index) {
     setState(() => _selectedIndex = index);
   }
 
-  _createGame() {
+  void _createGame() {
     Navigator.of(context).pushNamed(CreateGameScreen.routeName);
+  }
+
+  void _joinGame() {
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => SimpleDialog(
+          contentPadding: const EdgeInsets.all(16.0),
+          children: [
+            TextField(
+              onChanged: (value) => setState(() {}),
+              controller: _gameCodeController,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.go,
+              decoration: const InputDecoration(
+                labelText: 'Enter Game Code',
+                prefixText: '#',
+              ),
+              maxLength: 5,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+              onPressed: _gameCodeController.text.length == 5
+                  ? () {
+                      Navigator.of(context).popAndPushNamed(
+                        GameScreen.routeName,
+                        arguments: _gameCodeController.text.toUpperCase(),
+                      );
+                      _gameCodeController.clear();
+                    }
+                  : null,
+              child: const Text('Join Game'),
+            )
+          ],
+        ),
+      ),
+    );
+    // Navigator.of(context).pushNamed(CreateGameScreen.routeName);
   }
 
   @override
@@ -40,9 +82,12 @@ class _TabsScreenState extends State<TabsScreen> {
           style: TextStyle(fontFamily: 'LuckiestGuy'),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _createGame,
+          TextButton(
+            child: const Text(
+              'JOIN GAME',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: _joinGame,
           ),
         ],
       ),

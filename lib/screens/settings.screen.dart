@@ -11,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+      padding: const EdgeInsets.all(8.0),
       children: [
         Consumer<UI>(
           builder: (_, ui, __) => ListTile(
@@ -22,7 +22,6 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Toggle Dark Mode'),
           ),
         ),
-        const Divider(),
         OutlinedButton(
           onPressed: FirebaseAuth.instance.signOut,
           child: const Text('Sign out'),

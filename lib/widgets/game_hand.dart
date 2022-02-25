@@ -78,20 +78,6 @@ class GameHand extends StatelessWidget {
     print('Building game_hand');
     final mediaQuery = MediaQuery.of(context);
     final game = Provider.of<Game>(context);
-    if (game.cardsInHand.isEmpty) {
-      final message = game.cardsOnTable.isEmpty
-          ? 'Deal new hand...'
-          : 'You win! Play again';
-      return Center(
-        child: ElevatedButton(
-          child: Text(message),
-          onPressed: Provider.of<Game>(context, listen: false).generateNewCards,
-          style: ElevatedButton.styleFrom(
-            primary: Theme.of(context).colorScheme.secondary,
-          ),
-        ),
-      );
-    }
     return Stack(
       clipBehavior: Clip.none,
       children: _buildCardsLayout(

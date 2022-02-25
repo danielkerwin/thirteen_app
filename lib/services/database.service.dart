@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 import '../models/game.model.dart';
 
@@ -50,6 +51,11 @@ class DatabaseService {
       },
       SetOptions(merge: true),
     );
+  }
+
+  static Future<void> startGame(String gameId) async {
+    final startGame = FirebaseFunctions.instance.httpsCallable('startGame');
+    await startGame.call({'gameId': gameId});
   }
 
   static Future<void> deleteGame(String gameId) async {

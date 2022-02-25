@@ -104,8 +104,9 @@ class GameScreen extends StatelessWidget {
                 Center(
                   child: ElevatedButton(
                     child: const Text('Start game'),
-                    onPressed: Provider.of<Game>(context, listen: false)
-                        .generateNewCards,
+                    // onPressed: Provider.of<Game>(context, listen: false)
+                    //     .generateNewCards,
+                    onPressed: () => DatabaseService.startGame(gameId),
                     style: ElevatedButton.styleFrom(
                       primary: theme.colorScheme.secondary,
                     ),

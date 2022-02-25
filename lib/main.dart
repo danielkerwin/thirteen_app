@@ -39,12 +39,14 @@ class MyApp extends StatelessWidget {
           print('rebuilding');
           return StreamBuilder<User?>(
             stream: FirebaseAuth.instance.userChanges(),
-            builder: (context, user) {
+            builder: (context, authSnapshot) {
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 title: 'Thirteen',
                 theme: ui.isDarkMode ? darkTheme : lightTheme,
-                home: user.hasData ? const TabsScreen() : const AuthScreen(),
+                home: authSnapshot.hasData
+                    ? const TabsScreen()
+                    : const AuthScreen(),
                 routes: {
                   GamesScreen.routeName: (ctx) => const GamesScreen(),
                   GameScreen.routeName: (ctx) => const GameScreen(),

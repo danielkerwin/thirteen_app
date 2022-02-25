@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../models/game_card.model.dart';
+import '../../models/game_card.model.dart';
 import 'game_card_item.dart';
 
 class GameTable extends StatelessWidget {

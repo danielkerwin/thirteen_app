@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../services/database.service.dart';
+import '../../services/database.service.dart';
 import 'game_user.dart';
 
 class GamePlayers extends StatelessWidget {

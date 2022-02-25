@@ -5,11 +5,11 @@ import 'package:provider/provider.dart';
 
 import '../providers/game.provider.dart';
 import '../services/database.service.dart';
-import '../widgets/game_error.dart';
-import '../widgets/game_hand.dart';
-import '../widgets/game_table.dart';
-import '../widgets/game_players.dart';
-import '../widgets/game_user.dart';
+import '../widgets/game/game_error.dart';
+import '../widgets/game/game_hand.dart';
+import '../widgets/game/game_players.dart';
+import '../widgets/game/game_table.dart';
+import '../widgets/game/game_user.dart';
 
 class GameScreen extends StatelessWidget {
   static const routeName = '/game';

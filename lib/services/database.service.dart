@@ -2,7 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../models/game.model.dart';
 
+typedef DocStream = DocumentSnapshot<Map<String, dynamic>>;
+typedef CollectionStream = QuerySnapshot<Map<String, dynamic>>;
+
 class DatabaseService {
+  static Stream<DocStream> getUserStream(String userId) {
+    return FirebaseFirestore.instance.doc('users/$userId').snapshots();
+  }
+
   static Future<void> createGame(
     String gameId,
     String userId,
@@ -14,6 +21,7 @@ class DatabaseService {
       'createdById': userId,
       'createdByName': nickname,
       'status': GameStatus.created.index,
+      'playerIds': [userId],
       'rules': {},
     });
     final playerPath = '$gamePath/players/$userId';
@@ -27,42 +35,32 @@ class DatabaseService {
     // });
   }
 
-  static Future<void> deleteGame(
-    String gameId,
-  ) async {
+  static Future<void> deleteGame(String gameId) async {
     final gamePath = 'games/$gameId';
     await FirebaseFirestore.instance.doc(gamePath).delete();
   }
 
-  static Stream<QuerySnapshot<Map<String, dynamic>>> getGamesStream(
-      String userId) {
+  static Stream<CollectionStream> getGamesStream(String userId) {
     return FirebaseFirestore.instance
         .collection('games')
-        .where('userIds', arrayContains: userId)
+        .where('playerIds', arrayContains: userId)
         .snapshots();
   }
 
-  static Stream<DocumentSnapshot<Map<String, dynamic>>> getGameStream(
-    String gameId,
-  ) {
+  static Stream<DocStream> getGameStream(String gameId) {
     return FirebaseFirestore.instance
         .collection('games')
         .doc(gameId)
         .snapshots();
   }
 
-  static Stream<QuerySnapshot<Map<String, dynamic>>> getGamePlayersStream(
-    String gameId,
-  ) {
+  static Stream<CollectionStream> getGamePlayersStream(String gameId) {
     return FirebaseFirestore.instance
         .collection('games/$gameId/players')
         .snapshots();
   }
 
-  static Stream<DocumentSnapshot<Map<String, dynamic>>> getGamePlayerStream(
-    String gameId,
-    String userId,
-  ) {
+  static Stream<DocStream> getGamePlayerStream(String gameId, String userId) {
     return FirebaseFirestore.instance
         .doc('games/$gameId/players/$userId')
         .snapshots();

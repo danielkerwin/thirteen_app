@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'game_card_item.dart';
+import '../game/game_card_item.dart';
 
 class AppHero extends StatelessWidget {
   const AppHero({Key? key}) : super(key: key);

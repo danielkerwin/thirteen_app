@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/game_card.model.dart';
-import '../providers/game.provider.dart';
+import '../../models/game_card.model.dart';
+import '../../providers/game.provider.dart';
 import 'game_card_item.dart';
 
 class GameHand extends StatelessWidget {

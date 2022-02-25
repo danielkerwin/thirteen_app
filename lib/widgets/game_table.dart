@@ -51,10 +51,10 @@ class GameTable extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.secondary.withOpacity(0.1),
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
           colors: [
-            theme.colorScheme.secondary,
+            theme.colorScheme.secondary.withOpacity(0.5),
             theme.colorScheme.secondary.withOpacity(0)
           ],
         ),

@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../models/game.model.dart';
 import '../services/database.service.dart';
 import 'game.screen.dart';
 
@@ -9,10 +11,23 @@ class GamesScreen extends StatelessWidget {
   static const routeName = '/games';
   const GamesScreen({Key? key}) : super(key: key);
 
+  Widget _getGameStatus(int statusInt) {
+    final status = GameStatus.values[statusInt];
+    switch (status) {
+      case GameStatus.created:
+        return const Text('NEW');
+      case GameStatus.active:
+        return const Text('ACTIVE');
+      case GameStatus.complete:
+        return const Text('COMPLETE');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: DatabaseService.getGamesStream(),
+        stream: DatabaseService.getGamesStream(userId!),
         builder: (context, gamesSnapshot) {
           if (gamesSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -25,6 +40,7 @@ class GamesScreen extends StatelessWidget {
             itemBuilder: (ctx, idx) {
               final gameId = gamesSnapshot.data?.docs[idx].id;
               final gameData = gamesSnapshot.data?.docs[idx].data();
+              final status = gameData?['status'];
               Timestamp timestamp = gameData?['createdAt'];
               DateTime date = timestamp.toDate();
 
@@ -33,7 +49,7 @@ class GamesScreen extends StatelessWidget {
                   key: ValueKey(gameId),
                   direction: DismissDirection.endToStart,
                   onDismissed: (direction) {
-                    DatabaseService.deleteGame(gameId as String);
+                    DatabaseService.deleteGame(gameId!);
                   },
                   background: Container(
                     decoration: const BoxDecoration(
@@ -52,6 +68,7 @@ class GamesScreen extends StatelessWidget {
                   child: ListTile(
                     title: Text('Game #$gameId'),
                     subtitle: Text(DateFormat.yMMMd().format(date)),
+                    trailing: _getGameStatus(status as int),
                     onTap: () => Navigator.of(context).pushNamed(
                       GameScreen.routeName,
                       arguments: gameId,

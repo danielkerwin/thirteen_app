@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,7 +8,7 @@ import '../services/database.service.dart';
 import '../widgets/game_error.dart';
 import '../widgets/game_hand.dart';
 import '../widgets/game_table.dart';
-import '../widgets/game_opponents.dart';
+import '../widgets/game_players.dart';
 import '../widgets/game_user.dart';
 
 class GameScreen extends StatelessWidget {
@@ -42,6 +43,7 @@ class GameScreen extends StatelessWidget {
             if (!gameSnapshot.data!.exists) {
               return GameError(gameId: gameId);
             }
+            final userId = FirebaseAuth.instance.currentUser?.uid;
             return Container(
               padding: const EdgeInsets.all(4.0),
               decoration: BoxDecoration(
@@ -56,7 +58,7 @@ class GameScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const GameOpponents(),
+                  GamePlayers(gameId: gameId, userId: userId as String),
                   const SizedBox(
                     height: 10,
                   ),
@@ -76,12 +78,22 @@ class GameScreen extends StatelessWidget {
                             ? MainAxisAlignment.center
                             : MainAxisAlignment.start,
                     children: [
-                      Consumer<Game>(
-                        builder: (_, game, __) => GameUser(
-                          username: 'Me',
-                          cards: game.cardsInHand.length,
-                        ),
-                      ),
+                      StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+                        stream:
+                            DatabaseService.getGamePlayerStream(gameId, userId),
+                        builder: (context, gamePlayerSnapshot) {
+                          if (gamePlayerSnapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator.adaptive(),
+                            );
+                          }
+                          return GameUser(
+                            nickname: 'Me',
+                            cards: gamePlayerSnapshot.data?['cardsCount'],
+                          );
+                        },
+                      )
                     ],
                   ),
                   Center(

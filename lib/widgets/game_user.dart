@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class GameUser extends StatelessWidget {
-  final String username;
+  final String nickname;
   final int cards;
   final bool isActive;
 
   const GameUser({
     Key? key,
-    required this.username,
+    required this.nickname,
     required this.cards,
     this.isActive = false,
   }) : super(key: key);
@@ -24,7 +24,7 @@ class GameUser extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              username,
+              nickname,
               textAlign: TextAlign.justify,
               style: TextStyle(
                 fontWeight: FontWeight.bold,

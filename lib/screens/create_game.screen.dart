@@ -38,12 +38,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
       user?.uid ?? '',
       userData['nickname'],
     );
-    await FirebaseFirestore.instance
-        .collection('games/$gameId/players')
-        .doc(user?.uid)
-        .set({
-      'cards': [],
-    });
 
     Navigator.of(context).popAndPushNamed(
       GameScreen.routeName,

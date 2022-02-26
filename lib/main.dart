@@ -48,11 +48,8 @@ class MyApp extends StatelessWidget {
                     ? const TabsScreen()
                     : const AuthScreen(),
                 routes: {
-                  GamesScreen.routeName: (ctx) => const GamesScreen(),
                   GameScreen.routeName: (ctx) => const GameScreen(),
                   CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
-                  ScoreboardScreen.routeName: (ctx) => const ScoreboardScreen(),
-                  SettingsScreen.routeName: (ctx) => const SettingsScreen(),
                 },
               );
             },

@@ -8,8 +8,6 @@ import '../services/database.service.dart';
 import 'game.screen.dart';
 
 class GamesScreen extends StatelessWidget {
-  static const routeName = '/games';
-
   const GamesScreen({Key? key}) : super(key: key);
 
   Widget _getGameStatus(int statusInt) {

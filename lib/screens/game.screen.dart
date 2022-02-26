@@ -11,6 +11,7 @@ import '../widgets/game/game_players.dart';
 import '../widgets/game/game_start.dart';
 import '../widgets/game/game_table.dart';
 import '../widgets/game/game_user.dart';
+import 'games.screen.dart';
 
 class GameScreen extends StatelessWidget {
   static const routeName = '/game';
@@ -24,7 +25,8 @@ class GameScreen extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     final handHeight = mediaQuery.size.height * 0.30;
-    final gameId = ModalRoute.of(context)?.settings.arguments as String;
+    final gameId = ModalRoute.of(context)?.settings.arguments as String?;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -32,91 +34,106 @@ class GameScreen extends StatelessWidget {
           style: TextStyle(fontFamily: 'LuckiestGuy'),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Text('#$gameId'),
-            ),
-          )
+          if (gameId != null)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(
+                child: Text('#$gameId'),
+              ),
+            )
         ],
       ),
-      body: StreamBuilder<DocStream>(
-        stream: DatabaseService.getGameStream(gameId),
-        builder: (context, gameSnapshot) {
-          if (gameSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator.adaptive());
-          }
-          if (gameSnapshot.hasError) {
-            return GameError(gameId: gameId);
-          }
-          if (!gameSnapshot.data!.exists) {
-            return GameError(gameId: gameId);
-          }
-          final userId = FirebaseAuth.instance.currentUser?.uid;
-          final myData = gameSnapshot.data!['players'][userId];
-
-          return Container(
-            padding: const EdgeInsets.all(4.0),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  theme.primaryColor.withOpacity(0),
-                  theme.primaryColor.withOpacity(0.5),
+      body: gameId == null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Missing Game Code'),
+                  TextButton(
+                    child: const Text('Go back'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  )
                 ],
               ),
-            ),
-            child: Column(
-              children: [
-                GamePlayers(gameId: gameId, userId: userId!),
-                const SizedBox(
-                  height: 10,
-                ),
-                Expanded(
-                  child: Consumer<Game>(
-                    builder: (_, game, __) => GameTable(
-                      cards: game.cardsOnTable,
+            )
+          : StreamBuilder<DocStream>(
+              stream: DatabaseService.getGameStream(gameId),
+              builder: (context, gameSnapshot) {
+                if (gameSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
+                }
+                if (gameSnapshot.hasError) {
+                  return GameError(gameId: gameId);
+                }
+                if (!gameSnapshot.data!.exists) {
+                  return GameError(gameId: gameId);
+                }
+                final userId = FirebaseAuth.instance.currentUser?.uid;
+                final myData = gameSnapshot.data!['players'][userId];
+
+                return Container(
+                  padding: const EdgeInsets.all(4.0),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        theme.primaryColor.withOpacity(0),
+                        theme.primaryColor.withOpacity(0.5),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment:
-                      mediaQuery.orientation == Orientation.portrait
-                          ? MainAxisAlignment.center
-                          : MainAxisAlignment.start,
-                  children: [
-                    if (myData == null)
-                      ElevatedButton(
-                        child: const Text('Join Game'),
-                        onPressed: () =>
-                            DatabaseService.joinGame(gameId, userId),
-                      )
-                    else
-                      GameUser(
-                        nickname: 'Me',
-                        cards: myData['cardCount'],
+                  child: Column(
+                    children: [
+                      GamePlayers(gameId: gameId, userId: userId!),
+                      const SizedBox(
+                        height: 10,
                       ),
-                  ],
-                ),
-                GameStart(
-                  gameId: gameId,
-                ),
-                SizedBox(
-                  height: handHeight,
-                  child: GameHand(
-                    gameId: gameId,
-                    userId: userId,
+                      Expanded(
+                        child: Consumer<Game>(
+                          builder: (_, game, __) => GameTable(
+                            cards: game.cardsOnTable,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment:
+                            mediaQuery.orientation == Orientation.portrait
+                                ? MainAxisAlignment.center
+                                : MainAxisAlignment.start,
+                        children: [
+                          if (myData == null)
+                            ElevatedButton(
+                              child: const Text('Join Game'),
+                              onPressed: () =>
+                                  DatabaseService.joinGame(gameId, userId),
+                            )
+                          else
+                            GameUser(
+                              nickname: 'Me',
+                              cards: myData['cardCount'],
+                            ),
+                        ],
+                      ),
+                      GameStart(
+                        gameId: gameId,
+                      ),
+                      SizedBox(
+                        height: handHeight,
+                        child: GameHand(
+                          gameId: gameId,
+                          userId: userId,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                );
+              },
             ),
-          );
-        },
-      ),
       floatingActionButton: IconButton(
         onPressed: Provider.of<Game>(context, listen: false).sortCards,
         icon: const Icon(Icons.sort),

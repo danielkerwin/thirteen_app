@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {cards} from "./constants";
-import {shuffle} from "lodash";
+import {merge, shuffle} from "lodash";
 import {Card} from "./interfaces";
 
 admin.initializeApp();
@@ -68,5 +68,15 @@ export const startGame = functions
             `games/${gameId}/players/${userId}`
         ).set({cards: playerCardsMap.get(idx)});
       });
+
+      functions.logger.info(
+        `startGame ${gameId}: setting game status to active`,
+        {uid, gameId}
+      );
+
+      admin.firestore()
+        .doc(`/games/${gameId}`)
+        .set({ status: 1 }, { merge: true })
+
       return true;
     });

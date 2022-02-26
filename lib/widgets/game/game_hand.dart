@@ -24,6 +24,7 @@ class GameHand extends StatelessWidget {
     required double rotation,
     bool isSelected = false,
   }) {
+    print({'left': left, 'bottom': bottom, 'rotation': rotation}.toString());
     return Positioned(
       left: left,
       bottom: isSelected ? bottom + 50 : bottom,

@@ -29,57 +29,38 @@ const gameCardValues = [
 ];
 
 class GameCard extends GameCardValue {
-  final GameCardSuit suit;
-  final Color color;
-  final IconData icon;
+  late GameCardSuit suit;
+  late Color color;
+  late IconData icon;
   late String id;
 
   GameCard({
-    label,
-    value,
-    required this.suit,
-    required this.color,
-    required this.icon,
-  }) : super(label: label, value: value) {
-    id = '${suit.index}_$value';
+    required String label,
+    required int cardvalue,
+    required int suitValue,
+  }) : super(label: label, value: cardvalue) {
+    id = '${cardvalue}_$suitValue';
+    switch (suitValue) {
+      case 0:
+        suit = GameCardSuit.club;
+        color = Colors.black;
+        icon = FontAwesomeIcons.lightClub;
+        break;
+      case 1:
+        suit = GameCardSuit.spade;
+        color = Colors.black;
+        icon = FontAwesomeIcons.lightSpade;
+        break;
+      case 2:
+        suit = GameCardSuit.diamond;
+        color = Colors.red;
+        icon = FontAwesomeIcons.lightDiamond;
+        break;
+      case 3:
+        suit = GameCardSuit.heart;
+        color = Colors.red;
+        icon = FontAwesomeIcons.lightHeart;
+        break;
+    }
   }
 }
-
-final gameCards = [
-  ...gameCardValues.map(
-    (card) => GameCard(
-      label: card.label,
-      value: card.value,
-      suit: GameCardSuit.club,
-      icon: FontAwesomeIcons.lightClub,
-      color: Colors.black,
-    ),
-  ),
-  ...gameCardValues.map(
-    (card) => GameCard(
-      label: card.label,
-      value: card.value,
-      suit: GameCardSuit.spade,
-      icon: FontAwesomeIcons.lightSpade,
-      color: Colors.black,
-    ),
-  ),
-  ...gameCardValues.map(
-    (card) => GameCard(
-      label: card.label,
-      value: card.value,
-      suit: GameCardSuit.diamond,
-      icon: FontAwesomeIcons.lightDiamond,
-      color: Colors.red,
-    ),
-  ),
-  ...gameCardValues.map(
-    (card) => GameCard(
-      label: card.label,
-      value: card.value,
-      suit: GameCardSuit.heart,
-      icon: FontAwesomeIcons.lightHeart,
-      color: Colors.red,
-    ),
-  ),
-];

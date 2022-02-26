@@ -76,4 +76,10 @@ class DatabaseService {
         .doc(gameId)
         .snapshots();
   }
+
+  static Stream<DocStream> getPlayerStream(String gameId, String userId) {
+    return FirebaseFirestore.instance
+        .doc('games/$gameId/players/$userId')
+        .snapshots();
+  }
 }

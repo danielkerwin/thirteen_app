@@ -44,22 +44,6 @@ class Game with ChangeNotifier {
     notifyListeners();
   }
 
-  void generateNewCards() {
-    print('generating new cards');
-
-    final cardsToPickFrom = [...gameCards];
-    _cardsInHand = List.generate(13, (idx) {
-      final random = Random();
-      final randomIndex = random.nextInt(cardsToPickFrom.length);
-      final pickedCard = cardsToPickFrom[randomIndex];
-      cardsToPickFrom.removeAt(randomIndex);
-      return pickedCard;
-    });
-    _selectedCardsInHand.clear();
-    _cardsOnTable.clear();
-    notifyListeners();
-  }
-
   void sortCards() {
     print('sorting cards');
 

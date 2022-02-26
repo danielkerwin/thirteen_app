@@ -3,10 +3,18 @@ import 'package:provider/provider.dart';
 
 import '../../models/game_card.model.dart';
 import '../../providers/game.provider.dart';
+import '../../services/database.service.dart';
 import 'game_card_item.dart';
 
 class GameHand extends StatelessWidget {
-  const GameHand({Key? key}) : super(key: key);
+  final String gameId;
+  final String userId;
+
+  const GameHand({
+    Key? key,
+    required this.gameId,
+    required this.userId,
+  }) : super(key: key);
 
   Widget _buildCard({
     required BuildContext context,
@@ -77,15 +85,43 @@ class GameHand extends StatelessWidget {
   Widget build(BuildContext context) {
     print('Building game_hand');
     final mediaQuery = MediaQuery.of(context);
-    final game = Provider.of<Game>(context);
-    return Stack(
-      clipBehavior: Clip.none,
-      children: _buildCardsLayout(
-        context,
-        mediaQuery,
-        game.cardsInHand,
-        game.selectedCards,
-      ),
+
+    return StreamBuilder<DocStream>(
+      stream: DatabaseService.getPlayerStream(gameId, userId),
+      builder: (context, playerStream) {
+        if (playerStream.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+
+        if (!playerStream.data!.exists) {
+          return const Center(
+            child: Text('Waiting for game to start...'),
+          );
+        }
+
+        final data = playerStream.data!.data() as Map<String, dynamic>;
+        final cards = data['cards'] as List<dynamic>;
+
+        final gameCards = cards.map((card) {
+          return GameCard(
+            cardvalue: card['value'],
+            label: card['label'],
+            suitValue: card['suit'],
+          );
+        }).toList();
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: _buildCardsLayout(
+            context,
+            mediaQuery,
+            gameCards,
+            {},
+          ),
+        );
+      },
     );
   }
 }

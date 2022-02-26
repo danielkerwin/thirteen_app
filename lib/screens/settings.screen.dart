@@ -14,11 +14,9 @@ class SettingsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       children: [
         Consumer<UI>(
-          builder: (_, ui, __) => ListTile(
-            leading: Switch.adaptive(
-              value: ui.isDarkMode,
-              onChanged: (val) => ui.toggleDarkMode(),
-            ),
+          builder: (_, ui, __) => SwitchListTile.adaptive(
+            onChanged: (val) => ui.toggleDarkMode(),
+            value: ui.isDarkMode,
             title: const Text('Toggle Dark Mode'),
           ),
         ),

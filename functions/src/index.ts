@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
-import { startGameFunction } from "./startGame";
-import { joinGameFunction } from "./joinGame";
-import { playHandFunction } from "./playHand";
+import {startGameFunction} from "./startGame";
+import {joinGameFunction} from "./joinGame";
+import {playHandFunction} from "./playHand";
 
 admin.initializeApp();
 

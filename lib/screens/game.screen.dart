@@ -36,7 +36,7 @@ class GameScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 20.0),
               child: Center(
-                child: Text(
+                child: SelectableText(
                   '#$gameId',
                   style: const TextStyle(
                     fontSize: 18,
@@ -96,7 +96,7 @@ class GameScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       GamePlayers(gameId: gameId, userId: userId!),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       Expanded(
                         child: Consumer<Game>(
                           builder: (_, game, __) => GameTable(
@@ -105,10 +105,7 @@ class GameScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      if (myData == null)
-                        GameJoin(
-                          gameId: gameId,
-                        ),
+                      if (myData == null) GameJoin(gameId: gameId),
                       if (isCreatedByMe && status == 0)
                         GameStart(
                           gameId: gameId,

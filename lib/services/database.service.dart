@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 import '../models/game.model.dart';
+import '../models/game_card.model.dart';
 
 typedef DocStream = DocumentSnapshot<Map<String, dynamic>>;
 typedef CollectionStream = QuerySnapshot<Map<String, dynamic>>;
@@ -54,14 +55,22 @@ class DatabaseService {
 
   static Future playHand(
     String gameId,
-    List<Map<String, dynamic>> selected,
+    List<GameCard> selected,
   ) async {
     final playHand =
         FirebaseFunctions.instanceFor(region: 'australia-southeast1')
             .httpsCallable('playHand');
+
     return playHand.call({
       'gameId': gameId,
-      'cards': selected,
+      'cards': selected
+          .map(
+            (card) => {
+              'value': card.value,
+              'suit': card.suit.index,
+            },
+          )
+          .toList(),
     });
   }
 

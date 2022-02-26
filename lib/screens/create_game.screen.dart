@@ -68,11 +68,10 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
           Expanded(
             child: ListView(
               children: [
-                ListTile(
-                  leading: Switch.adaptive(
-                    value: _enableBombs,
-                    onChanged: (val) =>
-                        setState(() => _enableBombs = !_enableBombs),
+                SwitchListTile.adaptive(
+                  value: _enableBombs,
+                  onChanged: (val) => setState(
+                    () => _enableBombs = !_enableBombs,
                   ),
                   title: const Text('Enable bombs'),
                 ),
@@ -81,57 +80,55 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                     shrinkWrap: true,
                     physics: const ClampingScrollPhysics(),
                     children: [
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 30),
-                        leading: Switch.adaptive(
-                          value: true,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (val) {},
+                      SwitchListTile.adaptive(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
                         ),
+                        value: true,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (val) {},
                         title: const Text('Bomb on 2\'s'),
                         subtitle: const Text(
                           'A valid bomb can only be played on 2\'s',
                         ),
                       ),
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 30),
-                        leading: Switch.adaptive(
-                          value: true,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (val) {},
+                      SwitchListTile.adaptive(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
                         ),
+                        value: true,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (val) {},
                         title: const Text('Triple doubles (sequential)'),
                         subtitle: const Text('eg. 3,3,4,4,5,5'),
                       ),
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 30),
-                        leading: Switch.adaptive(
-                          value: true,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (val) {},
+                      SwitchListTile.adaptive(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
                         ),
+                        value: true,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (val) {},
                         title: const Text('Four of a kind'),
                         subtitle: const Text('eg. 7,7,7,7'),
                       ),
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 30),
-                        leading: Switch.adaptive(
-                          value: true,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (val) {},
+                      SwitchListTile.adaptive(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
                         ),
+                        value: true,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (val) {},
                         title: const Text('Pair & triple (sequential)'),
                         subtitle: const Text('eg. 4,4,5,5,5'),
                       ),
                     ],
                   ),
                 if (_enableBombs) const Divider(),
-                ListTile(
-                  leading: Switch.adaptive(
-                    value: _enableInstantWins,
-                    onChanged: (val) => setState(
-                      () => _enableInstantWins = !_enableInstantWins,
-                    ),
+                SwitchListTile.adaptive(
+                  value: _enableInstantWins,
+                  onChanged: (val) => setState(
+                    () => _enableInstantWins = !_enableInstantWins,
                   ),
                   title: const Text('Enable instant wins'),
                 ),
@@ -140,33 +137,33 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                     shrinkWrap: true,
                     physics: const ClampingScrollPhysics(),
                     children: [
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 30),
-                        leading: Switch.adaptive(
-                          value: true,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (val) {},
+                      SwitchListTile.adaptive(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
                         ),
+                        value: true,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (val) {},
                         title: const Text('Four 2\'s'),
                         subtitle: const Text('eg. 2,2,2,2'),
                       ),
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 30),
-                        leading: Switch.adaptive(
-                          value: true,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (val) {},
+                      SwitchListTile.adaptive(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
                         ),
+                        value: true,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (val) {},
                         title: const Text('Six pairs'),
                         subtitle: const Text('eg. 3,3,5,5,8,8,9,9,J,J,10,10'),
                       ),
-                      ListTile(
-                        contentPadding: const EdgeInsets.only(left: 30),
-                        leading: Switch.adaptive(
-                          value: true,
-                          activeColor: Theme.of(context).colorScheme.secondary,
-                          onChanged: (val) {},
+                      SwitchListTile.adaptive(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
                         ),
+                        value: true,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (val) {},
                         title: const Text('Dragon'),
                         subtitle:
                             const Text('eg. 3 to A: 3,4,5,6,7,8,9,10,J,Q,K,A'),
@@ -174,12 +171,10 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                     ],
                   ),
                 if (_enableInstantWins) const Divider(),
-                ListTile(
-                  leading: Switch.adaptive(
-                    value: _enableTimeLimit,
-                    onChanged: (val) =>
-                        setState(() => _enableTimeLimit = !_enableTimeLimit),
-                  ),
+                SwitchListTile.adaptive(
+                  value: _enableTimeLimit,
+                  onChanged: (val) =>
+                      setState(() => _enableTimeLimit = !_enableTimeLimit),
                   title: const Text('Enable time limits'),
                 ),
               ],

@@ -54,7 +54,7 @@ class GameTable extends StatelessWidget {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            theme.colorScheme.secondary.withOpacity(0.5),
+            theme.colorScheme.secondary.withOpacity(0.2),
             theme.colorScheme.secondary.withOpacity(0)
           ],
         ),

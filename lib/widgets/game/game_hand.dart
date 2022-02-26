@@ -64,7 +64,7 @@ class GameHand extends StatelessWidget {
     final leftStart = leftReduce / 3;
     final leftModifier = (size - leftReduce) / total;
     const rotationStart = -0.55;
-    final rotationModifier = rotationStart.abs() * 2 / total;
+    final rotationModifier = (rotationStart).abs() * 2 / total;
     var bottom = rotation == Orientation.landscape ? -100.0 : 20.0;
     const bottomModifier = 3.5;
 

@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 
 import '../../services/database.service.dart';
-import 'game_user.dart';
 
-class GameJoin extends StatelessWidget {
+class GameJoin extends StatefulWidget {
   final String gameId;
-  final Map<String, dynamic>? myData;
 
   const GameJoin({
     Key? key,
-    this.myData,
     required this.gameId,
   }) : super(key: key);
+
+  @override
+  State<GameJoin> createState() => _GameJoinState();
+}
+
+class _GameJoinState extends State<GameJoin> {
+  bool _isLoading = false;
+
+  Future<void> _joinGame() async {
+    setState(() => _isLoading = true);
+    await DatabaseService.joinGame(widget.gameId);
+    setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,16 +31,12 @@ class GameJoin extends StatelessWidget {
           ? MainAxisAlignment.center
           : MainAxisAlignment.start,
       children: [
-        if (myData == null)
-          ElevatedButton(
-            child: const Text('Join Game'),
-            onPressed: () => DatabaseService.joinGame(gameId),
-          )
-        else
-          GameUser(
-            nickname: 'Me',
-            cards: myData?['cardCount'],
-          ),
+        ElevatedButton(
+          child: _isLoading
+              ? const CircularProgressIndicator.adaptive()
+              : const Text('Join Game'),
+          onPressed: _isLoading ? null : _joinGame,
+        )
       ],
     );
   }

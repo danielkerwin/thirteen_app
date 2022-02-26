@@ -1,13 +1,13 @@
 enum GameStatus { created, active, complete }
 
-class Game {
+class GameModel {
   final String id;
   final DateTime createdAt;
   final String createdById;
   final String createdByName;
   GameStatus status;
 
-  Game({
+  GameModel({
     this.status = GameStatus.created,
     required this.id,
     required this.createdAt,

@@ -13,14 +13,21 @@ class GamePlayers extends StatelessWidget {
     required this.userId,
   }) : super(key: key);
 
-  List<GameUser> buildPlayers(Map<String, dynamic> data) {
-    final List<GameUser> gameUsers = [];
-    for (var doc in data.entries) {
-      if (doc.key != userId) {
+  List<Widget> buildPlayers(Map<String, dynamic> gameData) {
+    final playerIds = gameData['playerIds'];
+    final players = gameData['players'];
+    final activePlayerId = gameData['activePlayerId'];
+    final List<Widget> gameUsers = [];
+
+    for (var id in playerIds) {
+      bool isActive = activePlayerId == id;
+      final player = players[id];
+      if (player != null) {
         gameUsers.add(
           GameUser(
-            cards: doc.value['cardCount'],
-            nickname: doc.value['nickname'],
+            cards: players[id]['cardCount'],
+            nickname: players[id]['nickname'],
+            isActive: isActive,
           ),
         );
       }
@@ -43,10 +50,10 @@ class GamePlayers extends StatelessWidget {
             child: Text('Error has occurred - try again later'),
           );
         }
-        final data = gameSnapshot.data!.data();
+        final gameData = gameSnapshot.data!.data();
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: buildPlayers(data!['players']),
+          children: buildPlayers(gameData!),
         );
       },
     );

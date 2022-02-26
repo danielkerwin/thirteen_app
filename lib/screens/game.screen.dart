@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/game.model.dart';
 import '../providers/game.provider.dart';
 import '../services/database.service.dart';
 import '../widgets/game/game_error.dart';
@@ -37,9 +38,14 @@ class GameScreen extends StatelessWidget {
         actions: [
           if (gameId != null)
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(right: 20.0),
               child: Center(
-                child: Text('#$gameId'),
+                child: Text(
+                  '#$gameId',
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
               ),
             )
         ],
@@ -71,7 +77,12 @@ class GameScreen extends StatelessWidget {
                   return GameError(gameId: gameId);
                 }
                 final userId = FirebaseAuth.instance.currentUser?.uid;
-                final myData = gameSnapshot.data!['players'][userId];
+                final gameData = gameSnapshot.data!.data();
+                final playerCount = gameData!['playerIds'].length;
+                final status = gameData['status'];
+                final myData = gameData['players'][userId];
+
+                final isCreatedByMe = gameData['createdById'] == userId;
 
                 return Container(
                   padding: const EdgeInsets.all(4.0),
@@ -88,9 +99,7 @@ class GameScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       GamePlayers(gameId: gameId, userId: userId!),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      const SizedBox(height: 10),
                       Expanded(
                         child: Consumer<Game>(
                           builder: (_, game, __) => GameTable(
@@ -98,16 +107,16 @@ class GameScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      GameJoin(
-                        gameId: gameId,
-                        myData: myData,
-                      ),
-                      GameStart(
-                        gameId: gameId,
-                      ),
+                      const SizedBox(height: 20),
+                      if (myData == null)
+                        GameJoin(
+                          gameId: gameId,
+                        ),
+                      if (isCreatedByMe && status == 0)
+                        GameStart(
+                          gameId: gameId,
+                          isDisabled: playerCount < 4,
+                        ),
                       SizedBox(
                         height: handHeight,
                         child: GameHand(

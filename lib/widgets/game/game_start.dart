@@ -4,8 +4,13 @@ import '../../services/database.service.dart';
 
 class GameStart extends StatefulWidget {
   final String gameId;
+  final bool isDisabled;
 
-  const GameStart({Key? key, required this.gameId}) : super(key: key);
+  const GameStart({
+    Key? key,
+    required this.gameId,
+    this.isDisabled = false,
+  }) : super(key: key);
 
   @override
   _GameStartState createState() => _GameStartState();
@@ -28,7 +33,7 @@ class _GameStartState extends State<GameStart> {
         child: _isLoading
             ? const CircularProgressIndicator.adaptive()
             : const Text('Start game'),
-        onPressed: _isLoading ? null : _startGame,
+        onPressed: _isLoading || widget.isDisabled ? null : _startGame,
         style: ElevatedButton.styleFrom(
           primary: theme.colorScheme.secondary,
         ),

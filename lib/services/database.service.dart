@@ -33,24 +33,11 @@ class DatabaseService {
     });
   }
 
-  static Future<void> joinGame(
-    String gameId,
-    String userId,
-    // String nickname,
-  ) async {
-    final gamePath = 'games/$gameId';
-    await FirebaseFirestore.instance.doc(gamePath).set(
-      {
-        'playerIds': FieldValue.arrayUnion([userId]),
-        'players': {
-          userId: {
-            'cardCount': 0,
-            'nickname': 'nickname',
-          },
-        },
-      },
-      SetOptions(merge: true),
-    );
+  static Future joinGame(String gameId) async {
+    final joinGame =
+        FirebaseFunctions.instanceFor(region: 'australia-southeast1')
+            .httpsCallable('joinGame');
+    return joinGame.call({'gameId': gameId});
   }
 
   static Future startGame(String gameId) async {

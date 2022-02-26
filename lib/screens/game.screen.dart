@@ -7,6 +7,7 @@ import '../providers/game.provider.dart';
 import '../services/database.service.dart';
 import '../widgets/game/game_error.dart';
 import '../widgets/game/game_hand.dart';
+import '../widgets/game/game_join.dart';
 import '../widgets/game/game_players.dart';
 import '../widgets/game/game_start.dart';
 import '../widgets/game/game_table.dart';
@@ -100,24 +101,9 @@ class GameScreen extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        mainAxisAlignment:
-                            mediaQuery.orientation == Orientation.portrait
-                                ? MainAxisAlignment.center
-                                : MainAxisAlignment.start,
-                        children: [
-                          if (myData == null)
-                            ElevatedButton(
-                              child: const Text('Join Game'),
-                              onPressed: () =>
-                                  DatabaseService.joinGame(gameId, userId),
-                            )
-                          else
-                            GameUser(
-                              nickname: 'Me',
-                              cards: myData['cardCount'],
-                            ),
-                        ],
+                      GameJoin(
+                        gameId: gameId,
+                        myData: myData,
                       ),
                       GameStart(
                         gameId: gameId,

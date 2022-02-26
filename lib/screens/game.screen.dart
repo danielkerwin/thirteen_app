@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../models/game.model.dart';
 import '../providers/game.provider.dart';
 import '../services/database.service.dart';
 import '../widgets/game/game_error.dart';
@@ -12,8 +10,6 @@ import '../widgets/game/game_join.dart';
 import '../widgets/game/game_players.dart';
 import '../widgets/game/game_start.dart';
 import '../widgets/game/game_table.dart';
-import '../widgets/game/game_user.dart';
-import 'games.screen.dart';
 
 class GameScreen extends StatelessWidget {
   static const routeName = '/game';
@@ -68,7 +64,8 @@ class GameScreen extends StatelessWidget {
               builder: (context, gameSnapshot) {
                 if (gameSnapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                      child: CircularProgressIndicator.adaptive());
+                    child: CircularProgressIndicator.adaptive(),
+                  );
                 }
                 if (gameSnapshot.hasError) {
                   return GameError(gameId: gameId);

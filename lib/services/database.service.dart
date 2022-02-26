@@ -49,7 +49,20 @@ class DatabaseService {
 
   static Future<void> deleteGame(String gameId) async {
     final gamePath = 'games/$gameId';
-    await FirebaseFirestore.instance.doc(gamePath).delete();
+    return FirebaseFirestore.instance.doc(gamePath).delete();
+  }
+
+  static Future playHand(
+    String gameId,
+    List<Map<String, dynamic>> selected,
+  ) async {
+    final playHand =
+        FirebaseFunctions.instanceFor(region: 'australia-southeast1')
+            .httpsCallable('playHand');
+    return playHand.call({
+      'gameId': gameId,
+      'cards': selected,
+    });
   }
 
   static Stream<CollectionStream> getGamesStream(String userId) {

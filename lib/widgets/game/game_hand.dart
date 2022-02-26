@@ -6,7 +6,7 @@ import '../../providers/game.provider.dart';
 import '../../services/database.service.dart';
 import 'game_card_item.dart';
 
-class GameHand extends StatelessWidget {
+class GameHand extends StatefulWidget {
   final String gameId;
   final String userId;
 
@@ -15,6 +15,36 @@ class GameHand extends StatelessWidget {
     required this.gameId,
     required this.userId,
   }) : super(key: key);
+
+  @override
+  State<GameHand> createState() => _GameHandState();
+}
+
+class _GameHandState extends State<GameHand> {
+  final Map<String, GameCard> _selectedCards = {};
+
+  void _toggleCardSelection(GameCard card) {
+    print('toggling card ${card.id}');
+    if (_selectedCards.containsKey(card.id)) {
+      _selectedCards.remove(card.id);
+    } else {
+      _selectedCards.addAll({card.id: card});
+    }
+  }
+
+  void _playSelectedCards() {
+    print('playing selected cards');
+    DatabaseService.playHand(
+      widget.gameId,
+      _selectedCards.entries.map((card) {
+        return {
+          'value': card.value.value,
+          'suit': card.value.suit,
+        };
+      }).toList(),
+    );
+    _selectedCards.clear();
+  }
 
   Widget _buildCard({
     required BuildContext context,
@@ -31,10 +61,8 @@ class GameHand extends StatelessWidget {
         origin: const Offset(65, 100),
         transform: Matrix4.rotationZ(rotation),
         child: GestureDetector(
-          onVerticalDragEnd: (_) =>
-              Provider.of<Game>(context, listen: false).playSelectedCards(),
-          onTap: () => Provider.of<Game>(context, listen: false)
-              .toggleCardSelection(pickedCard.id),
+          onVerticalDragEnd: (_) => _playSelectedCards(),
+          onTap: () => _toggleCardSelection(pickedCard),
           child: GameCardItem(
             key: ValueKey(pickedCard.id),
             label: pickedCard.label,
@@ -87,7 +115,7 @@ class GameHand extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
 
     return StreamBuilder<DocStream>(
-      stream: DatabaseService.getPlayerStream(gameId, userId),
+      stream: DatabaseService.getPlayerStream(widget.gameId, widget.userId),
       builder: (context, playerStream) {
         if (playerStream.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -107,7 +135,6 @@ class GameHand extends StatelessWidget {
         final gameCards = cards.map((card) {
           return GameCard(
             cardvalue: card['value'],
-            label: card['label'],
             suitValue: card['suit'],
           );
         }).toList();

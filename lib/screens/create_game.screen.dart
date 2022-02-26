@@ -90,7 +90,8 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         title: const Text('Bomb on 2\'s'),
                         subtitle: const Text(
-                            'A valid bomb can only be played on 2\'s'),
+                          'A valid bomb can only be played on 2\'s',
+                        ),
                       ),
                       ListTile(
                         contentPadding: const EdgeInsets.only(left: 30),
@@ -129,7 +130,8 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                   leading: Switch.adaptive(
                     value: _enableInstantWins,
                     onChanged: (val) => setState(
-                        () => _enableInstantWins = !_enableInstantWins),
+                      () => _enableInstantWins = !_enableInstantWins,
+                    ),
                   ),
                   title: const Text('Enable instant wins'),
                 ),

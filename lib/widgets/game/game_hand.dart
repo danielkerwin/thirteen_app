@@ -112,13 +112,17 @@ class GameHand extends StatelessWidget {
           );
         }).toList();
 
-        return Stack(
-          clipBehavior: Clip.none,
-          children: _buildCardsLayout(
-            context,
-            mediaQuery,
-            gameCards,
-            {},
+        Provider.of<Game>(context, listen: false).cardsInHand = gameCards;
+
+        return Consumer<Game>(
+          builder: (_, game, __) => Stack(
+            clipBehavior: Clip.none,
+            children: _buildCardsLayout(
+              context,
+              mediaQuery,
+              game.cardsInHand,
+              game.selectedCards,
+            ),
           ),
         );
       },

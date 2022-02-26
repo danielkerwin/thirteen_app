@@ -24,7 +24,7 @@ class Game with ChangeNotifier {
 
   set cardsInHand(List<GameCard> cards) {
     _cardsInHand = cards;
-    notifyListeners();
+    // notifyListeners();
   }
 
   void toggleCardSelection(String id) {

@@ -53,9 +53,11 @@ class DatabaseService {
     );
   }
 
-  static Future<void> startGame(String gameId) async {
-    final startGame = FirebaseFunctions.instance.httpsCallable('startGame');
-    await startGame.call({'gameId': gameId});
+  static Future startGame(String gameId) async {
+    final startGame =
+        FirebaseFunctions.instanceFor(region: 'australia-southeast1')
+            .httpsCallable('startGame');
+    return startGame.call({'gameId': gameId});
   }
 
   static Future<void> deleteGame(String gameId) async {

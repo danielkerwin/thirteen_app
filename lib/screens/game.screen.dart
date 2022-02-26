@@ -8,6 +8,7 @@ import '../services/database.service.dart';
 import '../widgets/game/game_error.dart';
 import '../widgets/game/game_hand.dart';
 import '../widgets/game/game_players.dart';
+import '../widgets/game/game_start.dart';
 import '../widgets/game/game_table.dart';
 import '../widgets/game/game_user.dart';
 
@@ -39,7 +40,7 @@ class GameScreen extends StatelessWidget {
           )
         ],
       ),
-      body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      body: StreamBuilder<DocStream>(
         stream: DatabaseService.getGameStream(gameId),
         builder: (context, gameSnapshot) {
           if (gameSnapshot.connectionState == ConnectionState.waiting) {
@@ -101,14 +102,8 @@ class GameScreen extends StatelessWidget {
                       ),
                   ],
                 ),
-                Center(
-                  child: ElevatedButton(
-                    child: const Text('Start game'),
-                    onPressed: () => DatabaseService.startGame(gameId),
-                    style: ElevatedButton.styleFrom(
-                      primary: theme.colorScheme.secondary,
-                    ),
-                  ),
+                GameStart(
+                  gameId: gameId,
                 ),
                 SizedBox(
                   height: handHeight,

@@ -93,4 +93,12 @@ class DatabaseService {
         .doc('games/$gameId/players/$userId')
         .snapshots();
   }
+
+  static Stream<CollectionStream> getMovesStream(String gameId) {
+    return FirebaseFirestore.instance
+        .collection('games/$gameId/moves')
+        .orderBy('createdAt', descending: true)
+        .limit(2)
+        .snapshots();
+  }
 }

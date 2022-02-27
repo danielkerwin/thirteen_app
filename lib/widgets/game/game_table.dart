@@ -3,33 +3,42 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../models/game_card.model.dart';
+import '../../services/database.service.dart';
 import 'game_card_item.dart';
 
 class GameTable extends StatelessWidget {
-  final List<GameCard> cards;
-  const GameTable({Key? key, required this.cards}) : super(key: key);
+  final String gameId;
+  const GameTable({
+    Key? key,
+    required this.gameId,
+  }) : super(key: key);
 
-  List<Widget> _buildTable(
+  List<Widget> _buildCardsOnTable(
+    List<GameCard> cards,
     BoxConstraints constraints,
     MediaQueryData mediaQuery,
+    bool isPrevious,
   ) {
     double offset = 0.0;
     var modifier = (constraints.maxWidth - 100) / max(5, cards.length);
+    final scale = mediaQuery.orientation == Orientation.portrait ? 0.7 : 0.5;
     return cards.map(
       (card) {
         final widget = Positioned(
           left: 0 + (modifier * offset),
+          top: isPrevious ? 30 : null,
           child: Transform(
             origin: const Offset(65, 100),
             transform: Matrix4.rotationZ(-0.6 + offset / cards.length)
-              ..scale(
-                mediaQuery.orientation == Orientation.portrait ? 0.7 : 0.5,
-              )
+              ..scale(isPrevious ? scale * 0.75 : scale)
               ..translate(1.5),
-            child: GameCardItem(
-              label: card.label,
-              color: card.color,
-              icon: card.icon,
+            child: Opacity(
+              opacity: isPrevious ? 0.5 : 1.0,
+              child: GameCardItem(
+                label: card.label,
+                color: card.color,
+                icon: card.icon,
+              ),
             ),
           ),
         );
@@ -39,11 +48,16 @@ class GameTable extends StatelessWidget {
     ).toList();
   }
 
+  Stream<CollectionStream> get _getMovesStream {
+    return DatabaseService.getMovesStream(gameId);
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     print('building game_table');
+
     return Container(
       width: mediaQuery.size.width * 0.6,
       height: mediaQuery.size.height / 2 * 0.5,
@@ -67,12 +81,63 @@ class GameTable extends StatelessWidget {
           topRight: Radius.circular(20),
         ),
       ),
-      child: LayoutBuilder(
-        builder: (ctx, contraints) => Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
-          children: _buildTable(contraints, mediaQuery),
-        ),
+      child: StreamBuilder<CollectionStream>(
+        stream: _getMovesStream,
+        builder: (context, movesSnapshot) {
+          if (movesSnapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator.adaptive(),
+            );
+          }
+
+          final previousMove = movesSnapshot.data!.docs.length > 1
+              ? movesSnapshot.data!.docs[1].data()
+              : {};
+          final lastMove = movesSnapshot.data!.docs.isNotEmpty
+              ? movesSnapshot.data!.docs[0].data()
+              : {};
+
+          final previousCards = (previousMove.isNotEmpty
+              ? previousMove['cards']
+              : []) as List<dynamic>;
+          final lastCards =
+              (lastMove.isNotEmpty ? lastMove['cards'] : []) as List<dynamic>;
+
+          final previousGameCards = previousCards.map((card) {
+            return GameCard(
+              cardvalue: card['value'],
+              suitValue: card['suit'],
+            );
+          }).toList();
+
+          final lastGameCards = lastCards.map((card) {
+            return GameCard(
+              cardvalue: card['value'],
+              suitValue: card['suit'],
+            );
+          }).toList();
+
+          return LayoutBuilder(
+            builder: (ctx, contraints) => Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                ..._buildCardsOnTable(
+                  previousGameCards,
+                  contraints,
+                  mediaQuery,
+                  true,
+                ),
+                ..._buildCardsOnTable(
+                  lastGameCards,
+                  contraints,
+                  mediaQuery,
+                  false,
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

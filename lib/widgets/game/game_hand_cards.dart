@@ -18,9 +18,9 @@ class GameHandCards extends StatefulWidget {
 class _GameHandCardsState extends State<GameHandCards> {
   final List<GameCard> _cardsInHand = [];
   final Set<String> _selectedCards = {};
+  bool _isLoading = false;
 
   void _toggleCardSelection(String id) {
-    print('toggling card $id');
     setState(() {
       if (_selectedCards.contains(id)) {
         _selectedCards.remove(id);
@@ -30,16 +30,18 @@ class _GameHandCardsState extends State<GameHandCards> {
     });
   }
 
-  void _playSelectedCards() {
-    print('playing selected cards');
+  void _playSelectedCards() async {
+    if (_selectedCards.isEmpty) {
+      return;
+    }
+    setState(() => _isLoading = true);
     final cardsToPlay =
         _cardsInHand.where((card) => _selectedCards.contains(card.id)).toList();
-    DatabaseService.playHand(widget.gameId, cardsToPlay);
+    await DatabaseService.playHand(widget.gameId, cardsToPlay);
     setState(() {
-      print('before ${_cardsInHand.length}');
       _cardsInHand.removeWhere((card) => _selectedCards.contains(card.id));
-      print('after ${_cardsInHand.length}');
       _selectedCards.clear();
+      setState(() => _isLoading = false);
     });
   }
 
@@ -108,6 +110,14 @@ class _GameHandCardsState extends State<GameHandCards> {
   void initState() {
     super.initState();
     _cardsInHand.addAll(widget.cards);
+    _cardsInHand.sort(
+      (a, b) {
+        if (a.value == b.value) {
+          return a.suit.index - b.suit.index;
+        }
+        return a.value - b.value;
+      },
+    );
   }
 
   @override
@@ -115,11 +125,20 @@ class _GameHandCardsState extends State<GameHandCards> {
     print('Building game_hand_cards');
     final mediaQuery = MediaQuery.of(context);
     return Stack(
-      clipBehavior: Clip.none,
-      children: _buildCardsLayout(
-        context,
-        mediaQuery,
-      ),
+      alignment: Alignment.center,
+      children: [
+        Opacity(
+          opacity: _isLoading ? 0.2 : 1.0,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: _buildCardsLayout(
+              context,
+              mediaQuery,
+            ),
+          ),
+        ),
+        if (_isLoading) const CircularProgressIndicator()
+      ],
     );
   }
 }

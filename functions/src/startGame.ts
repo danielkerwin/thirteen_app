@@ -9,39 +9,55 @@ export const startGameFunction = functions
     .https
     .onCall(async (data, context) => {
       if (!context.auth) {
-        functions.logger.info("startGame: user not authenticated");
-        return false;
+        const message = "user not authenticated";
+        functions.logger.info(`startGame: ${message}`);
+        throw new functions.https.HttpsError(
+            "unauthenticated",
+            message,
+        );
       }
       const uid = context.auth.uid;
       const gameId: string = data.gameId;
 
       if (!gameId) {
-        functions.logger.info("startGame: missing gameId", {uid, gameId});
-        return false;
+        const message = "missing Game ID";
+        functions.logger.info(`startGame: ${message}`, {uid, gameId});
+        throw new functions.https.HttpsError(
+            "invalid-argument",
+            message,
+        );
       }
 
       const game = await admin.firestore().doc(`games/${gameId}`).get();
 
       if (!game.exists) {
-        functions.logger.info("startGame: game does not exist", {uid, gameId});
-        return false;
+        const message = "game does not exist";
+        functions.logger.info(`startGame: ${message}`, {uid, gameId});
+        throw new functions.https.HttpsError(
+            "not-found",
+            message,
+        );
       }
 
       const gameData = game.data();
       const playerIds: string[] = gameData?.playerIds ?? [];
 
+      if (playerIds.length % 2 > 0) {
+        const message = "there must an even number of players";
+        functions.logger.info(
+            `startGame ${gameId}: ${message}`,
+            {uid, gameId, playerIds},
+        );
+        throw new functions.https.HttpsError(
+            "invalid-argument",
+            message,
+        );
+      }
+
       functions.logger.info(
           `startGame ${gameId}: there are ${playerIds.length} players`,
           {uid, gameId, playerIds},
       );
-
-      if (playerIds.length % 2 !== 0) {
-        functions.logger.info(
-            `startGame ${gameId}: there must be an even number of players`,
-            {uid, gameId, playerIds},
-        );
-        return false;
-      }
 
       const playerCardsMap = playerIds.reduce((prev, id, idx) => {
         prev.set(idx, []);
@@ -52,7 +68,13 @@ export const startGameFunction = functions
           `startGame ${gameId}: shuffling cards`,
           {uid, gameId}
       );
+
       const shuffledCards = shuffle(cards);
+
+      if (playerIds.length == 2) {
+        shuffledCards.splice(26);
+      }
+
 
       let playerIndex = 0;
       let activePlayerId;

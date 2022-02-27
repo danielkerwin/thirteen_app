@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../models/game_card.model.dart';
-import '../../providers/game.provider.dart';
 import '../../services/database.service.dart';
 import 'game_hand_cards.dart';
 

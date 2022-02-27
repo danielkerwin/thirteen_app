@@ -45,6 +45,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# additional custom exclusions
 .env
-
 /fa
+google_service_account.json

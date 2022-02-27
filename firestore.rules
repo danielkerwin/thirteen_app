@@ -18,5 +18,9 @@ service cloud.firestore {
     	allow read: if request.auth != null && request.auth.uid == playerId;
     }
     
+    match /games/{gameId}/moves/{document=**} {
+    	allow read: if request.auth != null;
+    }
+    
   }
 }

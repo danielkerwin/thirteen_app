@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {Card} from "./interfaces";
+import {Card, GameData, PlayerCards} from "./interfaces";
 
 const isCardBetter = (prev: Card, current: Card) => {
   if (current.value === prev.value) {
@@ -26,8 +26,22 @@ export const playHandFunction = functions
         return false;
       }
 
+      const gameRef = await admin.firestore()
+          .doc(`games/${gameId}`).get();
+      const gameData = gameRef.data() as GameData;
+
+      if (!gameData || gameData.activePlayerId !== uid) {
+        functions.logger.info(
+            "playHand: not the active player!",
+            {uid, gameId}
+        );
+      }
+
       const currentMove: Card[] = data.cards;
-      functions.logger.info("playHand: got cards to play", {uid, gameId, currentMove});
+      functions.logger.info(
+          "playHand: got cards to play",
+          {uid, gameId, currentMove}
+      );
 
       currentMove.sort((a, b) => {
         return a.value - b.value || a.suit - b.suit;
@@ -37,6 +51,40 @@ export const playHandFunction = functions
           `games/${gameId}/moves`
       ).orderBy("createdAt", "desc").limit(1).get();
 
+      // TODO: TEMP ALLOW ALL MOVES
+      if (gameId) {
+        await admin.firestore().collection(`games/${gameId}/moves`)
+            .doc()
+            .set({
+              createdAt: admin.firestore.Timestamp.now(),
+              cards: currentMove,
+            });
+
+        const playerIndex = gameData.playerIds.indexOf(uid);
+        const nextPlayerIdx = playerIndex === gameData.playerIds.length -1 ?
+          0 :
+          playerIndex + 1;
+        const nextPlayerId = gameData.playerIds[nextPlayerIdx];
+        const player = gameData.players[uid];
+        player.cardCount -= currentMove.length;
+        await admin.firestore().doc(`games/${gameId}`).set(
+            {activePlayerId: nextPlayerId, players: {...player}},
+            {merge: true},
+        );
+        const playerRef = await admin.firestore()
+            .doc(`games/${gameId}/players/${uid}`).get();
+        const playerDoc = playerRef.data() as PlayerCards;
+        const updatedCards = playerDoc.cards.filter((card) => {
+          const cardKey = `${card.suit}_${card.value}`;
+          return currentMove.some((item) =>
+            `${item.suit}_${item.value}` === cardKey
+          );
+        });
+        playerDoc.cards = updatedCards;
+        await admin.firestore()
+            .doc(`games/${gameId}/players/${uid}`).update(playerDoc);
+        return true;
+      }
 
       const previousMove = moves.empty ? [] : moves.docs[0].data() as Card[];
       functions.logger.info(

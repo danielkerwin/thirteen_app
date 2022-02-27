@@ -53,13 +53,16 @@ export const playHandFunction = functions
 
       // TODO: TEMP ALLOW ALL MOVES
       if (gameId) {
-        await admin.firestore().collection(`games/${gameId}/moves`)
+        // add move to stack
+        const movePromise = admin.firestore()
+            .collection(`games/${gameId}/moves`)
             .doc()
             .set({
               createdAt: admin.firestore.Timestamp.now(),
               cards: currentMove,
             });
 
+        // update next player
         const playerIndex = gameData.playerIds.indexOf(uid);
         const nextPlayerIdx = playerIndex === gameData.playerIds.length -1 ?
           0 :
@@ -67,22 +70,29 @@ export const playHandFunction = functions
         const nextPlayerId = gameData.playerIds[nextPlayerIdx];
         const player = gameData.players[uid];
         player.cardCount -= currentMove.length;
-        await admin.firestore().doc(`games/${gameId}`).set(
-            {activePlayerId: nextPlayerId, players: {...player}},
+        const gamePromise = admin.firestore().doc(`games/${gameId}`).set(
+            {activePlayerId: nextPlayerId, players: {[uid]: player}},
             {merge: true},
         );
+
+        // remove cards from hand
         const playerRef = await admin.firestore()
             .doc(`games/${gameId}/players/${uid}`).get();
         const playerDoc = playerRef.data() as PlayerCards;
+        const cardsToRemove = currentMove.reduce((prev, card) => {
+          prev.set(`${card.suit}_${card.value}`, true);
+          return prev;
+        }, new Map<string, boolean>());
         const updatedCards = playerDoc.cards.filter((card) => {
-          const cardKey = `${card.suit}_${card.value}`;
-          return currentMove.some((item) =>
-            `${item.suit}_${item.value}` === cardKey
-          );
+          return !cardsToRemove.has(`${card.suit}_${card.value}`);
         });
         playerDoc.cards = updatedCards;
-        await admin.firestore()
-            .doc(`games/${gameId}/players/${uid}`).update(playerDoc);
+        const playerPromise = admin.firestore()
+            .doc(`games/${gameId}/players/${uid}`)
+            .update(playerDoc);
+
+        // execute all promises
+        await Promise.all([movePromise, gamePromise, playerPromise]);
         return true;
       }
 

@@ -26,7 +26,7 @@ class GamePlayers extends StatelessWidget {
         gameUsers.add(
           GameUser(
             cards: players[id]['cardCount'],
-            nickname: players[id]['nickname'],
+            nickname: userId == id ? 'Me' : players[id]['nickname'],
             isActive: isActive,
           ),
         );

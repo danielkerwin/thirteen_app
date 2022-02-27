@@ -17,7 +17,7 @@ class GameScreen extends StatelessWidget {
     print('building game_screen');
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
-    final handHeight = mediaQuery.size.height * 0.30;
+    final handHeight = mediaQuery.size.height * 0.35;
     final gameId = ModalRoute.of(context)?.settings.arguments as String?;
     final userId = FirebaseAuth.instance.currentUser?.uid;
 

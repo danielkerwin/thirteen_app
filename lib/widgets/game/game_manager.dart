@@ -35,6 +35,7 @@ class _GameManagerState extends State<GameManager> {
       await DatabaseService.startGame(widget.gameId);
       messenger.showSnackBar(const SnackBar(content: Text('Game started!')));
     } on FirebaseFunctionsException catch (err) {
+      messenger.hideCurrentSnackBar();
       messenger.showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,

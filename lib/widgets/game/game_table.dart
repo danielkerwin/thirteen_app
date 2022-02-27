@@ -26,7 +26,9 @@ class GameTable extends StatelessWidget {
       (card) {
         final widget = Positioned(
           left: 0 + (modifier * offset),
-          top: isPrevious ? 30 : null,
+          top: isPrevious
+              ? constraints.maxHeight * 0.1 - 60
+              : constraints.maxHeight * 0.15,
           child: Transform(
             origin: const Offset(65, 100),
             transform: Matrix4.rotationZ(-0.6 + offset / cards.length)

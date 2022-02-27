@@ -128,7 +128,7 @@ class _GameHandCardsState extends State<GameHandCards> {
       alignment: Alignment.center,
       children: [
         Opacity(
-          opacity: _isLoading ? 0.2 : 1.0,
+          opacity: _isLoading ? 0.7 : 1.0,
           child: Stack(
             clipBehavior: Clip.none,
             children: _buildCardsLayout(

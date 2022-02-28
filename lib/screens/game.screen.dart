@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../models/player.model.dart';
 import '../widgets/game/game_hand.dart';
 import '../widgets/game/game_manager.dart';
 import '../widgets/game/game_players.dart';
@@ -77,9 +79,11 @@ class GameScreen extends StatelessWidget {
                   GameManager(gameId: gameId, userId: userId),
                   SizedBox(
                     height: handHeight,
-                    child: GameHand(
-                      gameId: gameId,
-                      userId: userId,
+                    child: Consumer<PlayerHand>(
+                      builder: (_, playerHand, __) => GameHand(
+                        gameId: gameId,
+                        cards: playerHand.cards,
+                      ),
                     ),
                   ),
                 ],

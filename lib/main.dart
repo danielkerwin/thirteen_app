@@ -6,10 +6,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
+import 'helpers/helpers.dart';
 import 'models/user_data.model.dart';
 
 import 'screens/auth.screen.dart';
 import 'screens/create_game.screen.dart';
+import 'screens/game.screen.dart';
 import 'screens/tabs.screen.dart';
 import 'services/database.service.dart';
 import 'themes/dark.theme.dart';
@@ -33,21 +35,49 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.userChanges(),
-      builder: (context, authSnapshot) => StreamProvider<UserData>.value(
-        initialData: UserData.fromEmpty(),
-        value: DatabaseService.getUserStream(authSnapshot.data?.uid),
-        child: Consumer<UserData>(
-          builder: (_, userData, __) => MaterialApp(
-            title: 'Thirteen',
-            theme: userData.isDarkMode ? darkTheme : lightTheme,
-            home:
-                authSnapshot.hasData ? const TabsScreen() : const AuthScreen(),
-            routes: {
-              CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
+      builder: (context, authSnapshot) {
+        if (!authSnapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        }
+
+        return StreamProvider<UserData>.value(
+          initialData: UserData.fromEmpty(),
+          value: DatabaseService.getUserStream(authSnapshot.data?.uid),
+          child: Consumer<UserData>(
+            builder: (_, userData, __) {
+              print('building material_app');
+              return MaterialApp(
+                title: 'Thirteen',
+                theme: userData.isDarkMode ? darkTheme : lightTheme,
+                home: authSnapshot.hasData
+                    ? const TabsScreen()
+                    : const AuthScreen(),
+                routes: {
+                  CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
+                },
+                onGenerateRoute: (settings) {
+                  final segments = settings.name!.split('?');
+                  switch (segments[0]) {
+                    case GameScreen.routeName:
+                      final qs = segments[1].split('=');
+                      return Helpers.buildGameScreenRoute(
+                        qs[1],
+                        authSnapshot.data?.uid ?? '',
+                        settings,
+                      );
+                    default:
+                      return MaterialPageRoute(
+                        builder: (_) => const TabsScreen(),
+                      );
+                  }
+                },
+              );
             },
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

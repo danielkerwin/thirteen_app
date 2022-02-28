@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../helpers/helpers.dart';
 import '../models/game.model.dart';
-import '../models/moves.model.dart';
-import '../models/player.model.dart';
 import '../services/database.service.dart';
 import 'game.screen.dart';
 
@@ -70,8 +67,8 @@ class GamesScreen extends StatelessWidget {
                 '${DateFormat.yMMMd().format(game.createdAt)} - ${_getGameStatus(game.status)}',
               ),
               trailing: isActive ? Text(turnMessage) : null,
-              onTap: () => Navigator.of(context).push(
-                Helpers.buildGameScreenRoute(game.id, userId),
+              onTap: () => Navigator.of(context).pushNamed(
+                '${GameScreen.routeName}?id=${game.id}',
               ),
             ),
           ),

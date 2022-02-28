@@ -15,7 +15,12 @@ class Helpers {
     );
   }
 
-  static buildGameScreenRoute(String gameId, String userId) {
+  static buildGameScreenRoute(
+    String gameId,
+    String userId,
+    RouteSettings settings,
+  ) {
+    print('routing $gameId $userId');
     return MaterialPageRoute(
       builder: (ctx) {
         return MultiProvider(
@@ -38,8 +43,8 @@ class Helpers {
           ],
           child: GameScreen(gameId: gameId),
         );
-        // return GameScreen(gameId: game.id,);
       },
+      settings: settings,
     );
   }
 }

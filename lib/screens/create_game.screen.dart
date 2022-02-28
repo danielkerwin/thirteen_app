@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:nanoid/async.dart';
 
 import '../constants/nanoid.constant.dart';
-import '../helpers/helpers.dart';
 import '../services/database.service.dart';
 import 'game.screen.dart';
 
@@ -36,8 +35,8 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
     final gameId = await customAlphabet(nanoidCharacters, 5);
     await DatabaseService.createGame(gameId, user.uid, userData['nickname']);
 
-    Navigator.of(context).pushReplacement(
-      Helpers.buildGameScreenRoute(gameId, user.uid),
+    Navigator.of(context).popAndPushNamed(
+      '${GameScreen.routeName}?id=$gameId',
     );
   }
 

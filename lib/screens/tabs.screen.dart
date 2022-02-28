@@ -56,9 +56,8 @@ class _TabsScreenState extends State<TabsScreen> {
             ElevatedButton(
               onPressed: _gameCodeController.text.length == 5
                   ? () {
-                      Navigator.of(context).popAndPushNamed(
-                        GameScreen.routeName,
-                        arguments: _gameCodeController.text.toUpperCase(),
+                      Navigator.of(context).pushNamed(
+                        '${GameScreen.routeName}?id=${_gameCodeController.text.toUpperCase()}',
                       );
                       _gameCodeController.clear();
                     }
@@ -69,7 +68,6 @@ class _TabsScreenState extends State<TabsScreen> {
         ),
       ),
     );
-    // Navigator.of(context).pushNamed(CreateGameScreen.routeName);
   }
 
   @override

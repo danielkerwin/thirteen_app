@@ -4,6 +4,13 @@ import {cards} from "./constants";
 import {shuffle} from "lodash";
 import {Card} from "./interfaces";
 
+const cardSorter = (a: Card, b: Card) => {
+  if (a.value == b.value) {
+    return a.suit - b.suit;
+  }
+  return a.value - b.value;
+}
+
 export const startGameFunction = functions
     .region("australia-southeast1")
     .https
@@ -91,8 +98,9 @@ export const startGameFunction = functions
       );
       const players = gameData?.players;
       playerIds.forEach((userId, idx) => {
-        const cards = playerCardsMap.get(idx);
-        players[userId].cardCount = cards?.length;
+        const cards = playerCardsMap.get(idx) ?? [];
+        cards.sort(cardSorter);        
+        players[userId].cardCount = cards.length;
         admin.firestore().doc(
             `games/${gameId}/players/${userId}`
         ).set({cards});
@@ -100,12 +108,15 @@ export const startGameFunction = functions
 
       functions.logger.info(
           `startGame ${gameId}: setting game status to active`,
-          {uid, gameId}
+          {uid, gameId},
       );
 
       await admin.firestore()
           .doc(`/games/${gameId}`)
-          .set({players, activePlayerId, status: 1}, {merge: true});
+          .set(
+            {players, activePlayerId, status: 1},
+            {merge: true},
+          );
 
       return true;
     });

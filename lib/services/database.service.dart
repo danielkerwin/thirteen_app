@@ -12,6 +12,9 @@ typedef CollectionStream = QuerySnapshot<Map<String, dynamic>>;
 
 class DatabaseService {
   static Stream<UserData> getUserStream(String? userId) {
+    // if (userId == null) {
+    //   return const Stream.empty();
+    // }
     return FirebaseFirestore.instance
         .doc('users/$userId')
         .snapshots()

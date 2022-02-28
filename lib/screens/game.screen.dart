@@ -8,8 +8,10 @@ import '../widgets/game/game_table.dart';
 
 class GameScreen extends StatelessWidget {
   static const routeName = '/game';
+  final String gameId;
   const GameScreen({
     Key? key,
+    required this.gameId,
   }) : super(key: key);
 
   @override
@@ -18,7 +20,6 @@ class GameScreen extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     final handHeight = mediaQuery.size.height * 0.35;
-    final gameId = ModalRoute.of(context)?.settings.arguments as String?;
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     return Scaffold(

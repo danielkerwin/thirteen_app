@@ -3,13 +3,26 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 import '../models/game.model.dart';
 import '../models/game_card.model.dart';
+import '../models/moves.model.dart';
+import '../models/player.model.dart';
+import '../models/user_data.model.dart';
 
 typedef DocStream = DocumentSnapshot<Map<String, dynamic>>;
 typedef CollectionStream = QuerySnapshot<Map<String, dynamic>>;
 
 class DatabaseService {
-  static Stream<DocStream> getUserStream(String userId) {
-    return FirebaseFirestore.instance.doc('users/$userId').snapshots();
+  static Stream<UserData> getUserStream(String? userId) {
+    return FirebaseFirestore.instance
+        .doc('users/$userId')
+        .snapshots()
+        .map((snapshot) => UserData.fromFirestore(snapshot));
+  }
+
+  static Future<void> toggleDarkMode(String userId, bool isDarkMode) {
+    return FirebaseFirestore.instance.doc('users/$userId').set(
+      {'isDarkMode': isDarkMode},
+      SetOptions(merge: true),
+    );
   }
 
   static Future<void> createGame(
@@ -74,31 +87,42 @@ class DatabaseService {
     });
   }
 
-  static Stream<CollectionStream> getGamesStream(String userId) {
+  static Stream<List<Game>> getGamesStream(String userId) {
     return FirebaseFirestore.instance
         .collection('games')
         .where('playerIds', arrayContains: userId)
-        .snapshots();
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => Game.fromFirestore(doc)).toList();
+    });
   }
 
-  static Stream<DocStream> getGameStream(String gameId) {
+  static Stream<Game> getGameStream(String gameId) {
     return FirebaseFirestore.instance
         .collection('games')
         .doc(gameId)
-        .snapshots();
+        .snapshots()
+        .map((snapshot) => Game.fromFirestore(snapshot));
   }
 
-  static Stream<DocStream> getPlayerStream(String gameId, String userId) {
+  static Stream<PlayerHand> getPlayerHandStream(String gameId, String userId) {
     return FirebaseFirestore.instance
         .doc('games/$gameId/players/$userId')
-        .snapshots();
+        .snapshots()
+        .map(
+          (snapshot) => PlayerHand.fromFirestore(snapshot),
+        );
   }
 
-  static Stream<CollectionStream> getMovesStream(String gameId) {
+  static Stream<List<GameMoves>> getMovesStream(String gameId) {
     return FirebaseFirestore.instance
         .collection('games/$gameId/moves')
         .orderBy('createdAt', descending: true)
         .limit(2)
-        .snapshots();
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => GameMoves.fromFirestore(doc)).toList(),
+        );
   }
 }

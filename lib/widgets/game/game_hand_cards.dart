@@ -1,5 +1,7 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 
+import '../../helpers/helpers.dart';
 import '../../models/game_card.model.dart';
 import '../../services/database.service.dart';
 import 'game_card_item.dart';
@@ -8,8 +10,11 @@ class GameHandCards extends StatefulWidget {
   final String gameId;
   final List<GameCard> cards;
 
-  const GameHandCards({Key? key, required this.gameId, required this.cards})
-      : super(key: key);
+  const GameHandCards({
+    Key? key,
+    required this.gameId,
+    required this.cards,
+  }) : super(key: key);
 
   @override
   _GameHandCardsState createState() => _GameHandCardsState();
@@ -35,14 +40,27 @@ class _GameHandCardsState extends State<GameHandCards> {
       return;
     }
     setState(() => _isLoading = true);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
     final cardsToPlay =
         _cardsInHand.where((card) => _selectedCards.contains(card.id)).toList();
-    await DatabaseService.playHand(widget.gameId, cardsToPlay);
-    setState(() {
-      _cardsInHand.removeWhere((card) => _selectedCards.contains(card.id));
-      _selectedCards.clear();
-      setState(() => _isLoading = false);
-    });
+
+    try {
+      await DatabaseService.playHand(widget.gameId, cardsToPlay);
+      setState(() {
+        _cardsInHand.removeWhere((card) => _selectedCards.contains(card.id));
+        _selectedCards.clear();
+      });
+    } on FirebaseFunctionsException catch (err) {
+      messenger.showSnackBar(
+        Helpers.getSnackBar(err.message ?? 'Failed to play hand'),
+      );
+    } catch (err) {
+      messenger.showSnackBar(
+        Helpers.getSnackBar('Unknown error occurred'),
+      );
+    }
+    setState(() => _isLoading = false);
   }
 
   Widget _buildCard({

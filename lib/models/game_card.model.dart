@@ -18,7 +18,7 @@ class GameCardValue {
     if (value <= 8) {
       label = '${value + 2}';
     } else {
-      label = gameCardValueMap[value] as String;
+      label = gameCardValueMap[value]!;
     }
   }
 }

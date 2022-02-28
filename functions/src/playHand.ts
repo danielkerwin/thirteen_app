@@ -30,11 +30,18 @@ export const playHandFunction = functions
           .doc(`games/${gameId}`).get();
       const gameData = gameRef.data() as GameData;
 
+      console.log(gameData.activePlayerId, uid)
+      console.log(gameData.activePlayerId !== uid)
       if (!gameData || gameData.activePlayerId !== uid) {
+        const message = "Not the active player - please wait your turn";
         functions.logger.info(
-            "playHand: not the active player!",
+            `playHand: ${message}`,
             {uid, gameId}
         );
+        throw new functions.https.HttpsError(
+          "invalid-argument",
+          message,
+      );        
       }
 
       const currentMove: Card[] = data.cards;

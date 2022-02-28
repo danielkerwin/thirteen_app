@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/game_card.model.dart';
-import '../../services/database.service.dart';
+import '../../models/moves.model.dart';
 import 'game_card_item.dart';
 
 class GameTable extends StatelessWidget {
@@ -22,13 +23,14 @@ class GameTable extends StatelessWidget {
     double offset = 0.0;
     var modifier = (constraints.maxWidth - 100) / max(5, cards.length);
     final scale = mediaQuery.orientation == Orientation.portrait ? 0.7 : 0.5;
+    final topModifier = mediaQuery.orientation == Orientation.portrait
+        ? constraints.maxHeight * 0.15
+        : constraints.maxHeight * 0.10 - 20;
     return cards.map(
       (card) {
         final widget = Positioned(
           left: 0 + (modifier * offset),
-          top: isPrevious
-              ? constraints.maxHeight * 0.1 - 60
-              : constraints.maxHeight * 0.15,
+          top: isPrevious ? constraints.maxHeight * 0.1 - 70 : topModifier,
           child: Transform(
             origin: const Offset(65, 100),
             transform: Matrix4.rotationZ(-0.6 + offset / cards.length)
@@ -50,15 +52,16 @@ class GameTable extends StatelessWidget {
     ).toList();
   }
 
-  Stream<CollectionStream> get _getMovesStream {
-    return DatabaseService.getMovesStream(gameId);
-  }
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     print('building game_table');
+
+    final moves = Provider.of<List<GameMoves>>(context);
+
+    List<GameCard> previousCards = moves.length > 1 ? moves[1].cards : [];
+    List<GameCard> latestCards = moves.isNotEmpty ? moves[0].cards : [];
 
     return Container(
       width: mediaQuery.size.width * 0.6,
@@ -78,68 +81,27 @@ class GameTable extends StatelessWidget {
           color: theme.colorScheme.secondary,
           width: 0.7,
         ),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
       ),
-      child: StreamBuilder<CollectionStream>(
-        stream: _getMovesStream,
-        builder: (context, movesSnapshot) {
-          if (movesSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
-          }
-
-          final previousMove = movesSnapshot.data!.docs.length > 1
-              ? movesSnapshot.data!.docs[1].data()
-              : {};
-          final lastMove = movesSnapshot.data!.docs.isNotEmpty
-              ? movesSnapshot.data!.docs[0].data()
-              : {};
-
-          final previousCards = (previousMove.isNotEmpty
-              ? previousMove['cards']
-              : []) as List<dynamic>;
-          final lastCards =
-              (lastMove.isNotEmpty ? lastMove['cards'] : []) as List<dynamic>;
-
-          final previousGameCards = previousCards.map((card) {
-            return GameCard(
-              cardvalue: card['value'],
-              suitValue: card['suit'],
-            );
-          }).toList();
-
-          final lastGameCards = lastCards.map((card) {
-            return GameCard(
-              cardvalue: card['value'],
-              suitValue: card['suit'],
-            );
-          }).toList();
-
-          return LayoutBuilder(
-            builder: (ctx, contraints) => Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                ..._buildCardsOnTable(
-                  previousGameCards,
-                  contraints,
-                  mediaQuery,
-                  true,
-                ),
-                ..._buildCardsOnTable(
-                  lastGameCards,
-                  contraints,
-                  mediaQuery,
-                  false,
-                ),
-              ],
+      child: LayoutBuilder(
+        builder: (ctx, contraints) => Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            ..._buildCardsOnTable(
+              previousCards,
+              contraints,
+              mediaQuery,
+              true,
             ),
-          );
-        },
+            ..._buildCardsOnTable(
+              latestCards,
+              contraints,
+              mediaQuery,
+              false,
+            ),
+          ],
+        ),
       ),
     );
   }

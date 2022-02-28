@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../services/database.service.dart';
-import 'game_user.dart';
+import '../../models/game.model.dart';
+import 'game_player.dart';
 
 class GamePlayers extends StatelessWidget {
   final String gameId;
@@ -13,49 +14,42 @@ class GamePlayers extends StatelessWidget {
     required this.userId,
   }) : super(key: key);
 
-  List<Widget> buildPlayers(Map<String, dynamic> gameData) {
-    final playerIds = gameData['playerIds'];
-    final players = gameData['players'];
-    final activePlayerId = gameData['activePlayerId'];
-    final List<Widget> gameUsers = [];
+  List<Widget> buildPlayers(Game game) {
+    final List<Widget> gamePlayers = [];
 
-    for (var id in playerIds) {
-      bool isActive = activePlayerId == id;
-      final player = players[id];
+    for (var id in game.playerIds) {
+      bool isActive = game.activePlayerId == id;
+      final player = game.players[id];
       if (player != null) {
-        gameUsers.add(
-          GameUser(
-            cards: players[id]['cardCount'],
-            nickname: userId == id ? 'Me' : players[id]['nickname'],
+        gamePlayers.add(
+          GamePlayer(
+            cards: player.cardCount,
+            nickname: player.nickname,
             isActive: isActive,
+            isMe: userId == id,
           ),
         );
       }
     }
-    return gameUsers;
+    return gamePlayers;
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocStream>(
-      stream: DatabaseService.getGameStream(gameId),
-      builder: (context, gameSnapshot) {
-        if (gameSnapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator.adaptive(),
-          );
-        }
-        if (!gameSnapshot.data!.exists) {
-          return const Center(
-            child: Text('Error has occurred - try again later'),
-          );
-        }
-        final gameData = gameSnapshot.data!.data();
-        return Row(
+    print('building game_players');
+    final game = Provider.of<Game>(context);
+    final activePlayer =
+        game.players[game.activePlayerId]?.nickname ?? 'someone';
+    final message =
+        game.isActivePlayer ? 'It\'s your turn' : 'It\'s $activePlayer\'s turn';
+    return Column(
+      children: [
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: buildPlayers(gameData!),
-        );
-      },
+          children: buildPlayers(game),
+        ),
+        if (game.isActive) Text(message)
+      ],
     );
   }
 }

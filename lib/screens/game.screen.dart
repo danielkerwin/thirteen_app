@@ -19,9 +19,7 @@ class GameScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('building game_screen');
-    final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
-    final handHeight = mediaQuery.size.height * 0.35;
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
     return Scaffold(
@@ -31,64 +29,51 @@ class GameScreen extends StatelessWidget {
           style: TextStyle(fontFamily: 'LuckiestGuy'),
         ),
         actions: [
-          if (gameId != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 20.0),
-              child: Center(
-                child: SelectableText(
-                  '#$gameId',
-                  style: const TextStyle(
-                    fontSize: 18,
-                  ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: Center(
+              child: SelectableText(
+                '#$gameId',
+                style: const TextStyle(
+                  fontSize: 18,
                 ),
-              ),
-            )
-        ],
-      ),
-      body: gameId == null
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Missing Game Code'),
-                  TextButton(
-                    child: const Text('Go back'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  )
-                ],
-              ),
-            )
-          : Container(
-              padding: const EdgeInsets.all(4.0),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    theme.primaryColor.withOpacity(0),
-                    theme.primaryColor.withOpacity(0.5),
-                  ],
-                ),
-              ),
-              child: Column(
-                children: [
-                  GamePlayers(gameId: gameId, userId: userId!),
-                  const SizedBox(height: 5),
-                  Expanded(child: GameTable(gameId: gameId)),
-                  const SizedBox(height: 20),
-                  GameManager(gameId: gameId, userId: userId),
-                  SizedBox(
-                    height: handHeight,
-                    child: Consumer<PlayerHand>(
-                      builder: (_, playerHand, __) => GameHand(
-                        gameId: gameId,
-                        cards: playerHand.cards,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
+          )
+        ],
+      ),
+      body: Container(
+        padding: const EdgeInsets.all(4.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              theme.primaryColor.withOpacity(0),
+              theme.primaryColor.withOpacity(0.5),
+            ],
+          ),
+        ),
+        child: Column(
+          children: [
+            GamePlayers(gameId: gameId, userId: userId!),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [GameTable(gameId: gameId)],
+            ),
+            GameManager(gameId: gameId, userId: userId),
+            Expanded(
+              child: Consumer<PlayerHand>(
+                builder: (_, playerHand, __) => GameHand(
+                  gameId: gameId,
+                  cards: playerHand.cards,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

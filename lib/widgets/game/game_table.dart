@@ -39,6 +39,7 @@ class GameTable extends StatelessWidget {
             child: Opacity(
               opacity: isPrevious ? 0.5 : 1.0,
               child: GameCardItem(
+                key: ValueKey(card.id),
                 label: card.label,
                 color: card.color,
                 icon: card.icon,

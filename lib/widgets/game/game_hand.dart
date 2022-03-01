@@ -1,7 +1,9 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../helpers/helpers.dart';
+import '../../models/game.model.dart';
 import '../../models/game_card.model.dart';
 import '../../services/database.service.dart';
 import 'game_card_item.dart';
@@ -70,7 +72,9 @@ class _GameHandState extends State<GameHand> {
     required double rotation,
     bool isSelected = false,
   }) {
-    return Positioned(
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.easeInBack,
       left: left,
       bottom: isSelected ? bottom + 50 : bottom,
       child: Transform(
@@ -123,24 +127,60 @@ class _GameHandState extends State<GameHand> {
     });
   }
 
+  _skipRound() {}
+
+  void _unselectCards() {
+    setState(() {
+      _selectedCards.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     print('Building game_hand');
     final mediaQuery = MediaQuery.of(context);
-    return Stack(
-      alignment: Alignment.center,
+    final theme = Theme.of(context);
+    final game = Provider.of<Game>(context);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Opacity(
-          opacity: _isLoading ? 0.7 : 1.0,
+        Expanded(
           child: Stack(
-            clipBehavior: Clip.none,
-            children: _buildCardsLayout(
-              context,
-              mediaQuery,
-            ),
+            alignment: Alignment.center,
+            children: [
+              Opacity(
+                opacity: _isLoading ? 0.7 : 1.0,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: _buildCardsLayout(
+                    context,
+                    mediaQuery,
+                  ),
+                ),
+              ),
+              if (_isLoading) const CircularProgressIndicator()
+            ],
           ),
         ),
-        if (_isLoading) const CircularProgressIndicator()
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: game.isActivePlayer ? _skipRound : null,
+              child: const Text('Skip turn'),
+              style: ElevatedButton.styleFrom(
+                primary: theme.colorScheme.secondary,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _selectedCards.isNotEmpty ? _unselectCards : null,
+              child: Text('Unselect ${_selectedCards.length} cards'),
+              style: ElevatedButton.styleFrom(
+                primary: theme.colorScheme.secondary,
+              ),
+            ),
+          ],
+        )
       ],
     );
   }

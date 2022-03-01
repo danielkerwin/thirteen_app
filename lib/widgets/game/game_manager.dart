@@ -86,11 +86,7 @@ class _GameManagerState extends State<GameManager> {
               child: _isLoading
                   ? const CircularProgressIndicator.adaptive()
                   : const Text('Start game'),
-              // onPressed: _isLoading || widget.isDisabled ? null : _startGame,
               onPressed: _isLoading ? null : _startGame,
-              style: ElevatedButton.styleFrom(
-                primary: theme.colorScheme.secondary,
-              ),
             ),
           )
       ],

@@ -9,21 +9,25 @@ class AppHero extends StatelessWidget {
   List<Widget> get _heroCards {
     const cards = [
       GameCardItem(
+        key: ValueKey(1),
         label: '2',
         color: Colors.black,
         icon: FontAwesomeIcons.lightSpade,
       ),
       GameCardItem(
+        key: ValueKey(2),
         label: '2',
         color: Colors.black,
         icon: FontAwesomeIcons.lightClub,
       ),
       GameCardItem(
+        key: ValueKey(3),
         label: '2',
         color: Colors.red,
         icon: FontAwesomeIcons.lightDiamond,
       ),
       GameCardItem(
+        key: ValueKey(4),
         label: '2',
         color: Colors.red,
         icon: FontAwesomeIcons.lightHeart,

@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/game.model.dart';
 import '../models/game_card.model.dart';
@@ -11,17 +14,26 @@ typedef DocStream = DocumentSnapshot<Map<String, dynamic>>;
 typedef CollectionStream = QuerySnapshot<Map<String, dynamic>>;
 
 class DatabaseService {
-  static Stream<UserData> getUserStream(String? userId) {
-    // if (userId == null) {
-    //   return const Stream.empty();
-    // }
+  static Future<UserData> getUserFuture(String userId) async {
+    final snapshot =
+        await FirebaseFirestore.instance.doc('users/$userId').get();
+    return UserData.fromFirestore(snapshot);
+  }
+
+  static Stream<UserData> getUserStream(String? userId,
+      [bool isDarkMode = false]) {
+    if (userId == null) {
+      return Stream.value(UserData.fromEmpty(isDarkMode));
+    }
     return FirebaseFirestore.instance
         .doc('users/$userId')
         .snapshots()
         .map((snapshot) => UserData.fromFirestore(snapshot));
   }
 
-  static Future<void> toggleDarkMode(String userId, bool isDarkMode) {
+  static Future<void> toggleDarkMode(String userId, bool isDarkMode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkMode', isDarkMode);
     return FirebaseFirestore.instance.doc('users/$userId').set(
       {'isDarkMode': isDarkMode},
       SetOptions(merge: true),

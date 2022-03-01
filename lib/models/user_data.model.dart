@@ -11,8 +11,8 @@ class UserData {
     this.isDarkMode = false,
   });
 
-  factory UserData.fromEmpty() {
-    return const UserData(nickname: '', uid: '', isDarkMode: false);
+  factory UserData.fromEmpty([bool isDarkMode = false]) {
+    return UserData(nickname: '', uid: '', isDarkMode: isDarkMode);
   }
 
   factory UserData.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {

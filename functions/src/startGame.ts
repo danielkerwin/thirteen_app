@@ -9,7 +9,7 @@ const cardSorter = (a: Card, b: Card) => {
     return a.suit - b.suit;
   }
   return a.value - b.value;
-}
+};
 
 export const startGameFunction = functions
     .region("australia-southeast1")
@@ -99,7 +99,7 @@ export const startGameFunction = functions
       const players = gameData?.players;
       playerIds.forEach((userId, idx) => {
         const cards = playerCardsMap.get(idx) ?? [];
-        cards.sort(cardSorter);        
+        cards.sort(cardSorter);
         players[userId].cardCount = cards.length;
         admin.firestore().doc(
             `games/${gameId}/players/${userId}`
@@ -114,8 +114,8 @@ export const startGameFunction = functions
       await admin.firestore()
           .doc(`/games/${gameId}`)
           .set(
-            {players, activePlayerId, status: 1},
-            {merge: true},
+              {players, activePlayerId, status: 1},
+              {merge: true},
           );
 
       return true;

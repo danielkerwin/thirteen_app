@@ -11,7 +11,10 @@ class Helpers {
   static SnackBar getSnackBar(String message) {
     return SnackBar(
       behavior: SnackBarBehavior.floating,
-      content: Text(message),
+      content: Text(
+        message,
+        style: const TextStyle(fontFamily: 'Roboto'),
+      ),
     );
   }
 
@@ -20,7 +23,6 @@ class Helpers {
     String userId,
     RouteSettings settings,
   ) {
-    print('routing $gameId $userId');
     return MaterialPageRoute(
       builder: (ctx) {
         return MultiProvider(

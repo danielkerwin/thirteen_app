@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
           ),
           child: Consumer<UserData>(
             builder: (_, userData, __) {
-              if (!authSnapshot.hasData && userData.uid.isEmpty) {
+              if (authSnapshot.hasData && userData.uid.isEmpty) {
                 return Container(
                   decoration: BoxDecoration(
                     color: isDarkMode

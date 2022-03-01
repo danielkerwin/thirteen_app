@@ -27,11 +27,16 @@ void main() async {
   // FirebaseFunctions.instanceFor(region: 'australia-southeast1')
   //     .useFunctionsEmulator('localhost', 5001);
   // FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-  runApp(const MyApp());
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final SharedPreferences prefs;
+  const MyApp({
+    Key? key,
+    required this.prefs,
+  }) : super(key: key);
 
   // final _router = GoRouter(
   //   routes: [
@@ -48,57 +53,61 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SharedPreferences>(
-      future: SharedPreferences.getInstance(),
-      builder: (_, prefs) => StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, authSnapshot) {
-          if (prefs.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
-          }
-          final isDarkMode = prefs.data!.getBool('isDarkMode') ?? false;
-          return StreamProvider<UserData>.value(
-            initialData: UserData.fromEmpty(isDarkMode),
-            value: DatabaseService.getUserStream(
-              authSnapshot.data?.uid,
-              isDarkMode,
-            ),
-            child: Consumer<UserData>(
-              builder: (__, userData, ___) {
-                return MaterialApp(
-                  title: 'Thirteen',
-                  theme: userData.isDarkMode ? darkTheme : lightTheme,
-                  home: authSnapshot.hasData
-                      ? const TabsScreen()
-                      : const AuthScreen(),
-                  routes: {
-                    CreateGameScreen.routeName: (ctx) =>
-                        const CreateGameScreen(),
-                  },
-                  onGenerateRoute: (settings) {
-                    final segments = settings.name!.split('?');
-                    switch (segments[0]) {
-                      case GameScreen.routeName:
-                        final qs = segments[1].split('=');
-                        return Helpers.buildGameScreenRoute(
-                          qs[1],
-                          authSnapshot.data?.uid ?? '',
-                          settings,
-                        );
-                      default:
-                        return MaterialPageRoute(
-                          builder: (_) => const TabsScreen(),
-                        );
-                    }
-                  },
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        final isDarkMode = prefs.getBool('isDarkMode') ?? false;
+        return StreamProvider<UserData>.value(
+          initialData: UserData.fromEmpty(isDarkMode),
+          value: DatabaseService.getUserStream(
+            authSnapshot.data?.uid,
+            isDarkMode,
+          ),
+          child: Consumer<UserData>(
+            builder: (_, userData, __) {
+              if (!authSnapshot.hasData && userData.uid.isEmpty) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? darkTheme.backgroundColor
+                        : lightTheme.backgroundColor,
+                  ),
+                  child: const Center(child: CircularProgressIndicator()),
                 );
-              },
-            ),
-          );
-        },
-      ),
+              }
+
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Thirteen',
+                theme: userData.isDarkMode ? darkTheme : lightTheme,
+                home: authSnapshot.hasData && userData.uid.isNotEmpty
+                    ? const TabsScreen()
+                    : const AuthScreen(),
+                routes: {
+                  CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
+                },
+                onGenerateRoute: (settings) {
+                  final uri = Uri.parse(settings.name!);
+
+                  switch (uri.path) {
+                    case GameScreen.routeName:
+                      final gameId = uri.queryParameters['id'];
+                      return Helpers.buildGameScreenRoute(
+                        gameId!,
+                        authSnapshot.data?.uid ?? '',
+                        settings,
+                      );
+                    default:
+                      return MaterialPageRoute(
+                        builder: (_) => const TabsScreen(),
+                      );
+                  }
+                },
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

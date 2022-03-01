@@ -23,6 +23,15 @@ class Helpers {
     String userId,
     RouteSettings settings,
   ) {
+    if (userId.isEmpty) {
+      return MaterialPageRoute(
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        settings: settings,
+      );
+    }
+
     return MaterialPageRoute(
       builder: (ctx) {
         return MultiProvider(

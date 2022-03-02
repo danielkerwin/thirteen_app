@@ -17,8 +17,7 @@ export const startGameFunction = functions
     .region("australia-southeast1")
     .https
     .onCall(async (data, context) => {
-      
-      const uid = context.auth?.uid ?? 'unknown';
+      const uid = context.auth?.uid ?? "unknown";
       const gameId = data.gameId;
       const gameData = await getGameData(funcName, gameId, context);
 

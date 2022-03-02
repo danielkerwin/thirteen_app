@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {Card, PlayerData} from "./interfaces";
-import { getGameData } from "./constants";
+import {getGameData} from "./constants";
 
 const isCardBetter = (prev: Card, current: Card) => {
   if (current.value === prev.value) {
@@ -16,8 +16,7 @@ export const playHandFunction = functions
     .region("australia-southeast1")
     .https
     .onCall(async (data, context) => {
-      
-      const uid = context.auth?.uid ?? 'unknown';
+      const uid = context.auth?.uid ?? "unknown";
       const gameId = data.gameId;
       const gameData = await getGameData(funcName, gameId, context);
 

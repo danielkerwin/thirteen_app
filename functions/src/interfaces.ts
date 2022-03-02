@@ -5,13 +5,18 @@ export interface Card {
   value: number;
 }
 
-export interface PlayerCards {
+export interface PlayerData {
   cards: Card[];
 }
 
-export interface PlayerData {
+export interface PlayerInfo {
+  round: number;
   cardCount: number;
   nickname: string;
+}
+
+export interface Players {
+  [uid: string]: PlayerInfo;
 }
 
 export interface GameData {
@@ -20,9 +25,8 @@ export interface GameData {
   createdById: string;
   createdByName: string;
   playerIds: string[];
-  players: {
-    [key: string]: PlayerData;
-  }
+  players: Players;
   rules: Record<string, unknown>;
   status: number;
+  round: number;
 }

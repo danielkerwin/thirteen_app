@@ -39,10 +39,16 @@ class _GameHandState extends State<GameHand> {
   }
 
   void _playSelectedCards(Game game) async {
-    if (_selectedCards.isEmpty || !game.isActivePlayer) {
+    if (_selectedCards.isEmpty) {
+      return;
+    }
+
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+
+    if (!game.isActivePlayer) {
       final activePlayer = game.activePlayerName;
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         Helpers.getSnackBar(
           'You\'re not the active player - it\'s $activePlayer\'s turn',
         ),
@@ -51,8 +57,7 @@ class _GameHandState extends State<GameHand> {
     }
 
     setState(() => _isLoading = true);
-    final messenger = ScaffoldMessenger.of(context);
-    messenger.hideCurrentSnackBar();
+
     final cardsToPlay =
         widget.cards.where((card) => _selectedCards.contains(card.id)).toList();
 
@@ -71,6 +76,37 @@ class _GameHandState extends State<GameHand> {
         Helpers.getSnackBar('Unknown error occurred'),
       );
     }
+    setState(() => _isLoading = false);
+  }
+
+  void _skipRound(Game game) async {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+
+    if (!game.isActivePlayer) {
+      final activePlayer = game.activePlayerName;
+      messenger.showSnackBar(
+        Helpers.getSnackBar(
+          'You\'re not the active player - it\'s $activePlayer\'s turn',
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await DatabaseService.skipRound(widget.gameId);
+    } on FirebaseFunctionsException catch (err) {
+      messenger.showSnackBar(
+        Helpers.getSnackBar(err.message ?? 'Failed to skip round'),
+      );
+    } catch (err) {
+      messenger.showSnackBar(
+        Helpers.getSnackBar('Unknown error occurred'),
+      );
+    }
+
     setState(() => _isLoading = false);
   }
 
@@ -138,8 +174,6 @@ class _GameHandState extends State<GameHand> {
     });
   }
 
-  _skipRound() {}
-
   void _unselectCards() {
     setState(() {
       _selectedCards.clear();
@@ -181,7 +215,9 @@ class _GameHandState extends State<GameHand> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             ElevatedButton(
-              onPressed: game.isActivePlayer ? _skipRound : null,
+              onPressed: !game.isActivePlayer || game.isSkippedRound
+                  ? null
+                  : () => _skipRound(game),
               child: const Text('Skip'),
               style: ElevatedButton.styleFrom(
                 primary: theme.colorScheme.secondary,

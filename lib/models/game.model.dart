@@ -13,7 +13,8 @@ class Game {
   final String activePlayerId;
   final List<String> playerIds;
   final GameStatus status;
-  final Map<String, PlayerData> players;
+  final Map<String, PlayerInfo> players;
+  final int round;
 
   Game({
     required this.status,
@@ -24,6 +25,7 @@ class Game {
     required this.activePlayerId,
     required this.playerIds,
     required this.players,
+    required this.round,
   });
 
   bool get isCreatedByMe {
@@ -39,6 +41,11 @@ class Game {
   bool get isActivePlayer {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     return activePlayerId == userId;
+  }
+
+  bool get isSkippedRound {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    return (players[userId]?.round ?? 0) > round;
   }
 
   bool get isActive {
@@ -72,6 +79,7 @@ class Game {
       playerIds: [],
       players: {},
       status: GameStatus.created,
+      round: 1,
     );
   }
 
@@ -91,13 +99,15 @@ class Game {
       players: players.map((key, player) {
         return MapEntry(
           key,
-          PlayerData(
+          PlayerInfo(
             cardCount: player['cardCount'] ?? 0,
+            round: player['round'] ?? 0,
             nickname: player['nickname'] ?? '',
           ),
         );
       }),
       status: status,
+      round: gameData['round'] ?? 1,
     );
   }
 }

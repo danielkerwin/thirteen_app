@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {Card, GameData, PlayerCards} from "./interfaces";
+import {Card, PlayerData} from "./interfaces";
+import { getGameData } from "./constants";
 
 const isCardBetter = (prev: Card, current: Card) => {
   if (current.value === prev.value) {
@@ -9,33 +10,21 @@ const isCardBetter = (prev: Card, current: Card) => {
   return current.value > prev.value;
 };
 
+const funcName = "playHand";
 
 export const playHandFunction = functions
     .region("australia-southeast1")
     .https
     .onCall(async (data, context) => {
-      if (!context.auth) {
-        functions.logger.info("playHand: user not authenticated");
-        return false;
-      }
-      const uid = context.auth.uid;
-      const gameId: string = data.gameId;
+      
+      const uid = context.auth?.uid ?? 'unknown';
+      const gameId = data.gameId;
+      const gameData = await getGameData(funcName, gameId, context);
 
-      if (!gameId) {
-        functions.logger.info("playHand: missing gameId", {uid, gameId});
-        return false;
-      }
-
-      const gameRef = await admin.firestore()
-          .doc(`games/${gameId}`).get();
-      const gameData = gameRef.data() as GameData;
-
-      console.log(gameData.activePlayerId, uid);
-      console.log(gameData.activePlayerId !== uid);
       if (!gameData || gameData.activePlayerId !== uid) {
-        const message = "Not the active player - please wait your turn";
+        const message = "Not the active player";
         functions.logger.info(
-            `playHand: ${message}`,
+            `${funcName} ${gameId}: ${message}`,
             {uid, gameId}
         );
         throw new functions.https.HttpsError(
@@ -46,7 +35,7 @@ export const playHandFunction = functions
 
       const currentMove: Card[] = data.cards;
       functions.logger.info(
-          "playHand: got cards to play",
+          `${funcName} ${gameId}: got cards to play`,
           {uid, gameId, currentMove}
       );
 
@@ -67,6 +56,7 @@ export const playHandFunction = functions
             .set({
               createdAt: admin.firestore.Timestamp.now(),
               cards: currentMove,
+              round: gameData.round,
             });
 
         // update next player
@@ -85,7 +75,7 @@ export const playHandFunction = functions
         // remove cards from hand
         const playerRef = await admin.firestore()
             .doc(`games/${gameId}/players/${uid}`).get();
-        const playerDoc = playerRef.data() as PlayerCards;
+        const playerDoc = playerRef.data() as PlayerData;
         const cardsToRemove = currentMove.reduce((prev, card) => {
           prev.set(`${card.suit}_${card.value}`, true);
           return prev;
@@ -105,7 +95,7 @@ export const playHandFunction = functions
 
       const previousMove = moves.empty ? [] : moves.docs[0].data() as Card[];
       functions.logger.info(
-          "playHand: evaluating move",
+          `${funcName} ${gameId}: evaluating move`,
           {uid, gameId, currentMove, previousMove}
       );
 
@@ -114,7 +104,7 @@ export const playHandFunction = functions
       (currentMove[0].suit !== 0 || currentMove[0].value !== 1)
       ) {
         functions.logger.info(
-            "playHand: first move must play 3 of spades",
+            `${funcName} ${gameId}: first move must play 3 of spades`,
             {uid, gameId, currentMove},
         );
         return false;

@@ -5,6 +5,7 @@ class GamePlayer extends StatelessWidget {
   final int cards;
   final bool isActive;
   final bool isMe;
+  final bool isSkipped;
 
   const GamePlayer({
     Key? key,
@@ -12,6 +13,7 @@ class GamePlayer extends StatelessWidget {
     required this.cards,
     this.isActive = false,
     this.isMe = false,
+    this.isSkipped = false,
   }) : super(key: key);
 
   @override

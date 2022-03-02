@@ -2,12 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'game_card.model.dart';
 
-class PlayerData {
+class PlayerInfo {
   final int cardCount;
+  final int round;
   final String nickname;
 
-  const PlayerData({
+  const PlayerInfo({
     required this.cardCount,
+    required this.round,
     required this.nickname,
   });
 }

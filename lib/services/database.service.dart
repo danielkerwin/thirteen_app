@@ -102,6 +102,13 @@ class DatabaseService {
     });
   }
 
+  static Future skipRound(String gameId) async {
+    final skipRound =
+        FirebaseFunctions.instanceFor(region: 'australia-southeast1')
+            .httpsCallable('skipRound');
+    return skipRound.call({'gameId': gameId});
+  }
+
   static Stream<List<Game>> getGamesStream(String userId) {
     return FirebaseFirestore.instance
         .collection('games')

@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {cards} from "./constants";
+import {cards, getGameData} from "./constants";
 import {shuffle} from "lodash";
 import {Card} from "./interfaces";
 
@@ -11,48 +11,23 @@ const cardSorter = (a: Card, b: Card) => {
   return a.value - b.value;
 };
 
+const funcName = "startGame";
+
 export const startGameFunction = functions
     .region("australia-southeast1")
     .https
     .onCall(async (data, context) => {
-      if (!context.auth) {
-        const message = "user not authenticated";
-        functions.logger.info(`startGame: ${message}`);
-        throw new functions.https.HttpsError(
-            "unauthenticated",
-            message,
-        );
-      }
-      const uid = context.auth.uid;
-      const gameId: string = data.gameId;
+      
+      const uid = context.auth?.uid ?? 'unknown';
+      const gameId = data.gameId;
+      const gameData = await getGameData(funcName, gameId, context);
 
-      if (!gameId) {
-        const message = "missing Game ID";
-        functions.logger.info(`startGame: ${message}`, {uid, gameId});
-        throw new functions.https.HttpsError(
-            "invalid-argument",
-            message,
-        );
-      }
-
-      const game = await admin.firestore().doc(`games/${gameId}`).get();
-
-      if (!game.exists) {
-        const message = "game does not exist";
-        functions.logger.info(`startGame: ${message}`, {uid, gameId});
-        throw new functions.https.HttpsError(
-            "not-found",
-            message,
-        );
-      }
-
-      const gameData = game.data();
       const playerIds: string[] = gameData?.playerIds ?? [];
 
       if (playerIds.length % 2 > 0) {
         const message = "Cannot start game - must be an even number of players";
         functions.logger.info(
-            `startGame ${gameId}: ${message}`,
+            `${funcName} ${gameId}: ${message}`,
             {uid, gameId, playerIds},
         );
         throw new functions.https.HttpsError(
@@ -62,7 +37,7 @@ export const startGameFunction = functions
       }
 
       functions.logger.info(
-          `startGame ${gameId}: there are ${playerIds.length} players`,
+          `${funcName} ${gameId}: there are ${playerIds.length} players`,
           {uid, gameId, playerIds},
       );
 
@@ -72,7 +47,7 @@ export const startGameFunction = functions
       }, new Map<number, Card[]>());
 
       functions.logger.info(
-          `startGame ${gameId}: shuffling cards`,
+          `${funcName} ${gameId}: shuffling cards`,
           {uid, gameId}
       );
 
@@ -109,7 +84,7 @@ export const startGameFunction = functions
       });
 
       functions.logger.info(
-          `startGame ${gameId}: distributing cards`,
+          `${funcName} ${gameId}: distributing cards`,
           {uid, gameId}
       );
       const players = gameData?.players;
@@ -123,7 +98,7 @@ export const startGameFunction = functions
       });
 
       functions.logger.info(
-          `startGame ${gameId}: setting game status to active`,
+          `${funcName} ${gameId}: setting game status to active`,
           {uid, gameId},
       );
 

@@ -76,7 +76,7 @@ class _GameHandState extends State<GameHand> {
     bool isSelected = false,
   }) {
     return AnimatedPositioned(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 250),
       curve: Curves.easeInBack,
       left: left,
       bottom: isSelected ? bottom + 50 : bottom,

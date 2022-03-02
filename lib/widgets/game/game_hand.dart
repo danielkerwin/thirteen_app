@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -70,6 +72,7 @@ class _GameHandState extends State<GameHand> {
     required double left,
     required double bottom,
     required double rotation,
+    required double scale,
     bool isSelected = false,
   }) {
     return AnimatedPositioned(
@@ -79,7 +82,7 @@ class _GameHandState extends State<GameHand> {
       bottom: isSelected ? bottom + 50 : bottom,
       child: Transform(
         origin: const Offset(65, 100),
-        transform: Matrix4.rotationZ(rotation),
+        transform: Matrix4.rotationZ(rotation)..scale(scale),
         child: GestureDetector(
           onVerticalDragEnd: (_) => _playSelectedCards(),
           onTap: () => _toggleCardSelection(pickedCard.id),
@@ -105,8 +108,9 @@ class _GameHandState extends State<GameHand> {
     final size = deviceSize.width;
 
     final total = widget.cards.length;
-    final leftReduce = rotation == Orientation.landscape ? 280 : 100;
-    final leftStart = leftReduce / 3;
+    final leftReduce = rotation == Orientation.landscape ? 200 : 80;
+    final leftMultipler = rotation == Orientation.landscape ? 8 : 1;
+    final leftStart = (150 * leftMultipler) / total;
     final leftModifier = (size - leftReduce) / total;
     const rotationStart = -0.55;
     final rotationModifier = ((rotationStart * 2) / total).abs();
@@ -123,6 +127,7 @@ class _GameHandState extends State<GameHand> {
         bottom: bottom,
         rotation: rotationStart + (index * rotationModifier),
         isSelected: _selectedCards.contains(widget.cards[index].id),
+        scale: min(size / (total * 25), 1.0),
       );
     });
   }

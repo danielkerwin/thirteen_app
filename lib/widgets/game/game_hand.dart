@@ -109,7 +109,7 @@ class _GameHandState extends State<GameHand> {
     final size = deviceSize.width;
 
     final total = widget.cards.length;
-    final leftReduce = rotation == Orientation.landscape ? 200 : 80;
+    final leftReduce = rotation == Orientation.landscape ? 300 : 80;
     final leftMultipler = rotation == Orientation.landscape ? 8 : 1;
     final leftStart = (150 * leftMultipler) / total;
     final leftModifier = (size - leftReduce) / total;
@@ -172,18 +172,31 @@ class _GameHandState extends State<GameHand> {
           ),
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             ElevatedButton(
               onPressed: game.isActivePlayer ? _skipRound : null,
-              child: const Text('Skip turn'),
+              child: const Text('Skip'),
               style: ElevatedButton.styleFrom(
                 primary: theme.colorScheme.secondary,
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed:
+                      _selectedCards.isNotEmpty ? _playSelectedCards : null,
+                  child: Text('Play ${_selectedCards.length} selected'),
+                  style: ElevatedButton.styleFrom(
+                      // primary: theme.primaryColor,
+                      ),
+                ),
+              ],
+            ),
             ElevatedButton(
               onPressed: _selectedCards.isNotEmpty ? _unselectCards : null,
-              child: Text('Unselect ${_selectedCards.length} cards'),
+              child: const Text('Unselect'),
               style: ElevatedButton.styleFrom(
                 primary: theme.colorScheme.secondary,
               ),

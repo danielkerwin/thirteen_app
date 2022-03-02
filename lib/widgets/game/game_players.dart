@@ -38,17 +38,12 @@ class GamePlayers extends StatelessWidget {
   Widget build(BuildContext context) {
     print('building game_players');
     final game = Provider.of<Game>(context);
-    final activePlayer =
-        game.players[game.activePlayerId]?.nickname ?? 'someone';
-    final message =
-        game.isActivePlayer ? 'It\'s your turn' : 'It\'s $activePlayer\'s turn';
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: buildPlayers(game),
         ),
-        if (game.isActive) Text(message)
       ],
     );
   }

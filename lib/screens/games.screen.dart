@@ -40,7 +40,6 @@ class GamesScreen extends StatelessWidget {
             isMyTurn ? 'YOUR TURN' : '$activePlayer\'s turn'.toUpperCase();
 
         return Card(
-          color: isMyTurn ? theme.primaryColorLight : null,
           child: Dismissible(
             key: ValueKey(game.id),
             direction: DismissDirection.endToStart,
@@ -66,7 +65,16 @@ class GamesScreen extends StatelessWidget {
               subtitle: Text(
                 '${DateFormat.yMMMd().format(game.createdAt)} - ${_getGameStatus(game.status)}',
               ),
-              trailing: isActive ? Text(turnMessage) : null,
+              trailing: isActive
+                  ? Text(
+                      turnMessage,
+                      style: TextStyle(
+                        color: isMyTurn
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.secondary,
+                      ),
+                    )
+                  : null,
               onTap: () => Navigator.of(context).pushNamed(
                 '${GameScreen.routeName}?id=${game.id}',
               ),

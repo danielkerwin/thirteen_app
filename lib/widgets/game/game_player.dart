@@ -18,11 +18,11 @@ class GamePlayer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activeColor =
-        isMe ? theme.primaryColorLight : theme.colorScheme.secondary;
+        isMe ? theme.colorScheme.primary : theme.colorScheme.secondary;
     // final activeTextColor =
     return Expanded(
       child: SizedBox(
-        height: 55,
+        height: 50,
         child: Card(
           color: isActive ? activeColor : null,
           child: Column(
@@ -34,10 +34,8 @@ class GamePlayer extends StatelessWidget {
                   textAlign: TextAlign.justify,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: isActive && !isMe
-                        ? theme.colorScheme.onSecondary
-                        : null,
+                    fontSize: 16,
+                    color: isActive ? theme.colorScheme.onSecondary : null,
                   ),
                 ),
               ),
@@ -45,8 +43,7 @@ class GamePlayer extends StatelessWidget {
                 '$cards cards',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color:
-                      isActive && !isMe ? theme.colorScheme.onSecondary : null,
+                  color: isActive ? theme.colorScheme.onSecondary : null,
                 ),
               )
             ],

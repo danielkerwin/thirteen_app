@@ -83,7 +83,7 @@ export const startGameFunction = functions
 
       let playerIndex = 0;
       let lowestCard: Card;
-      let activePlayerId: String;
+      let activePlayerId: string | null = null;
 
       shuffledCards.forEach((card) => {
         const player = playerCardsMap.get(playerIndex);
@@ -93,11 +93,11 @@ export const startGameFunction = functions
           activePlayerId = playerIds[playerIndex];
         }
 
-        if (card.value < lowestCard.value || 
-          (card.value === lowestCard.value && 
+        if (card.value < lowestCard.value ||
+          (card.value === lowestCard.value &&
             card.suit < lowestCard.suit)) {
-            lowestCard = card;
-            activePlayerId = playerIds[playerIndex];
+          lowestCard = card;
+          activePlayerId = playerIds[playerIndex];
         }
 
         if (card.suit === 0 && card.value === 1) {

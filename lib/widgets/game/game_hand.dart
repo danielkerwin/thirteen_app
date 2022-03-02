@@ -72,7 +72,6 @@ class _GameHandState extends State<GameHand> {
     required double left,
     required double bottom,
     required double rotation,
-    required double scale,
     bool isSelected = false,
   }) {
     return AnimatedPositioned(
@@ -82,7 +81,7 @@ class _GameHandState extends State<GameHand> {
       bottom: isSelected ? bottom + 50 : bottom,
       child: Transform(
         origin: const Offset(65, 100),
-        transform: Matrix4.rotationZ(rotation)..scale(scale),
+        transform: Matrix4.rotationZ(rotation),
         child: GestureDetector(
           onVerticalDragEnd: (_) => _playSelectedCards(),
           onTap: () => _toggleCardSelection(pickedCard.id),
@@ -107,28 +106,23 @@ class _GameHandState extends State<GameHand> {
     final deviceSize = mediaQuery.size;
 
     final size = deviceSize.width;
-
-    final total = widget.cards.length;
-    final leftReduce = rotation == Orientation.landscape ? 300 : 80;
-    final leftMultipler = rotation == Orientation.landscape ? 8 : 1;
-    final leftStart = (150 * leftMultipler) / total;
-    final leftModifier = (size - leftReduce) / total;
+    final totalCards = widget.cards.length;
+    const leftStart = 30;
     const rotationStart = -0.55;
-    final rotationModifier = ((rotationStart * 2) / total).abs();
+    final rotationModifier = ((rotationStart * 2) / totalCards).abs();
     var bottom = rotation == Orientation.landscape ? -100.0 : 20.0;
     const bottomModifier = 3.5;
 
-    return List.generate(total, (index) {
-      final isHalfWay = index >= total / 2;
+    return List.generate(totalCards, (index) {
+      final isHalfWay = index >= totalCards / 2;
       bottom = isHalfWay ? bottom - bottomModifier : bottom + bottomModifier;
       return _buildCard(
         context: context,
         pickedCard: widget.cards[index],
-        left: leftStart + (index * leftModifier),
+        left: leftStart + (index * ((size - leftStart * 3) / totalCards)),
         bottom: bottom,
         rotation: rotationStart + (index * rotationModifier),
         isSelected: _selectedCards.contains(widget.cards[index].id),
-        scale: min(size / (total * 25), 1.0),
       );
     });
   }
@@ -185,8 +179,9 @@ class _GameHandState extends State<GameHand> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed:
-                      _selectedCards.isNotEmpty ? _playSelectedCards : null,
+                  onPressed: _selectedCards.isEmpty || _isLoading
+                      ? null
+                      : _playSelectedCards,
                   child: Text('Play ${_selectedCards.length} selected'),
                   style: ElevatedButton.styleFrom(
                       // primary: theme.primaryColor,
@@ -195,7 +190,8 @@ class _GameHandState extends State<GameHand> {
               ],
             ),
             ElevatedButton(
-              onPressed: _selectedCards.isNotEmpty ? _unselectCards : null,
+              onPressed:
+                  _selectedCards.isEmpty || _isLoading ? null : _unselectCards,
               child: const Text('Unselect'),
               style: ElevatedButton.styleFrom(
                 primary: theme.colorScheme.secondary,

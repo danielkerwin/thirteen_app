@@ -91,6 +91,7 @@ class _GameHandState extends State<GameHand> {
             label: pickedCard.label,
             color: pickedCard.color,
             icon: pickedCard.icon,
+            selectedIcon: pickedCard.selectedIcon,
             isSelected: isSelected,
           ),
         ),
@@ -154,7 +155,7 @@ class _GameHandState extends State<GameHand> {
             alignment: Alignment.center,
             children: [
               Opacity(
-                opacity: _isLoading ? 0.7 : 1.0,
+                opacity: _isLoading ? 0.8 : 1.0,
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: _buildCardsLayout(
@@ -163,7 +164,10 @@ class _GameHandState extends State<GameHand> {
                   ),
                 ),
               ),
-              if (_isLoading) const CircularProgressIndicator()
+              if (_isLoading)
+                CircularProgressIndicator(
+                  backgroundColor: theme.primaryColor,
+                )
             ],
           ),
         ),

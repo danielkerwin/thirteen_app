@@ -5,6 +5,7 @@ class GameCardItem extends StatelessWidget {
   final String label;
   final Color color;
   final IconData icon;
+  final IconData selectedIcon;
   final bool isSelected;
 
   const GameCardItem({
@@ -12,6 +13,7 @@ class GameCardItem extends StatelessWidget {
     required this.label,
     required this.color,
     required this.icon,
+    required this.selectedIcon,
     this.isSelected = false,
   }) : super(key: key);
 
@@ -53,7 +55,7 @@ class GameCardItem extends StatelessWidget {
                         ),
                       ),
                       FaIcon(
-                        icon,
+                        isSelected ? selectedIcon : icon,
                         color: color,
                       ),
                     ],

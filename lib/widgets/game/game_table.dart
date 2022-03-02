@@ -43,6 +43,7 @@ class GameTable extends StatelessWidget {
                 label: card.label,
                 color: card.color,
                 icon: card.icon,
+                selectedIcon: card.icon,
               ),
             ),
           ),

@@ -27,6 +27,7 @@ class GameCard extends GameCardValue {
   late GameCardSuit suit;
   late Color color;
   late IconData icon;
+  late IconData selectedIcon;
   late String id;
 
   GameCard({
@@ -39,21 +40,25 @@ class GameCard extends GameCardValue {
         suit = GameCardSuit.spade;
         color = Colors.black;
         icon = FontAwesomeIcons.lightSpade;
+        selectedIcon = FontAwesomeIcons.solidSpade;
         break;
       case 1:
         suit = GameCardSuit.club;
         color = Colors.black;
         icon = FontAwesomeIcons.lightClub;
+        selectedIcon = FontAwesomeIcons.solidClub;
         break;
       case 2:
         suit = GameCardSuit.diamond;
         color = Colors.red;
         icon = FontAwesomeIcons.lightDiamond;
+        selectedIcon = FontAwesomeIcons.solidDiamond;
         break;
       case 3:
         suit = GameCardSuit.heart;
         color = Colors.red;
         icon = FontAwesomeIcons.lightHeart;
+        selectedIcon = FontAwesomeIcons.solidHeart;
         break;
     }
   }

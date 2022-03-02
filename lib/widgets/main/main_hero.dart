@@ -13,24 +13,28 @@ class AppHero extends StatelessWidget {
         label: '2',
         color: Colors.black,
         icon: FontAwesomeIcons.lightSpade,
+        selectedIcon: FontAwesomeIcons.spade,
       ),
       GameCardItem(
         key: ValueKey(2),
         label: '2',
         color: Colors.black,
         icon: FontAwesomeIcons.lightClub,
+        selectedIcon: FontAwesomeIcons.club,
       ),
       GameCardItem(
         key: ValueKey(3),
         label: '2',
         color: Colors.red,
         icon: FontAwesomeIcons.lightDiamond,
+        selectedIcon: FontAwesomeIcons.diamond,
       ),
       GameCardItem(
         key: ValueKey(4),
         label: '2',
         color: Colors.red,
         icon: FontAwesomeIcons.lightHeart,
+        selectedIcon: FontAwesomeIcons.heart,
       ),
     ];
     var item = 0;

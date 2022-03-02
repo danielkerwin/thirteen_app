@@ -45,6 +45,10 @@ class Game {
     return status == GameStatus.active;
   }
 
+  String get activePlayerName {
+    return players[activePlayerId]?.nickname ?? 'someone';
+  }
+
   static GameStatus _getStatus(int status) {
     switch (status) {
       case 0:

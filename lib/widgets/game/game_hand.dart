@@ -38,10 +38,18 @@ class _GameHandState extends State<GameHand> {
     });
   }
 
-  void _playSelectedCards() async {
-    if (_selectedCards.isEmpty) {
+  void _playSelectedCards(Game game) async {
+    if (_selectedCards.isEmpty || !game.isActivePlayer) {
+      final activePlayer = game.activePlayerName;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        Helpers.getSnackBar(
+          'You\'re not the active player - it\'s $activePlayer\'s turn',
+        ),
+      );
       return;
     }
+
     setState(() => _isLoading = true);
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
@@ -67,6 +75,7 @@ class _GameHandState extends State<GameHand> {
   }
 
   Widget _buildCard({
+    required Game game,
     required BuildContext context,
     required GameCard pickedCard,
     required double left,
@@ -83,7 +92,7 @@ class _GameHandState extends State<GameHand> {
         origin: const Offset(65, 100),
         transform: Matrix4.rotationZ(rotation),
         child: GestureDetector(
-          onVerticalDragEnd: (_) => _playSelectedCards(),
+          onVerticalDragEnd: (_) => _playSelectedCards(game),
           onTap: () => _toggleCardSelection(pickedCard.id),
           child: GameCardItem(
             key: ValueKey(pickedCard.id),
@@ -99,6 +108,7 @@ class _GameHandState extends State<GameHand> {
   }
 
   List<Widget> _buildCardsLayout(
+    Game game,
     BuildContext context,
     MediaQueryData mediaQuery,
   ) {
@@ -117,6 +127,7 @@ class _GameHandState extends State<GameHand> {
       final isHalfWay = index >= totalCards / 2;
       bottom = isHalfWay ? bottom - bottomModifier : bottom + bottomModifier;
       return _buildCard(
+        game: game,
         context: context,
         pickedCard: widget.cards[index],
         left: leftStart + (index * ((size - leftStart * 3) / totalCards)),
@@ -153,6 +164,7 @@ class _GameHandState extends State<GameHand> {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: _buildCardsLayout(
+                    game,
                     context,
                     mediaQuery,
                   ),
@@ -181,7 +193,7 @@ class _GameHandState extends State<GameHand> {
                 ElevatedButton(
                   onPressed: _selectedCards.isEmpty || _isLoading
                       ? null
-                      : _playSelectedCards,
+                      : () => _playSelectedCards(game),
                   child: Text('Play ${_selectedCards.length} selected'),
                   style: ElevatedButton.styleFrom(
                       // primary: theme.primaryColor,

@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {getGameData, shouldUpdateRound} from "./constants";
+import {getGameData, getNextPlayerId, shouldUpdateRound} from "./constants";
 import {GameData, PlayerInfo, Players} from "./interfaces";
 
 const funcName = "skipRound";
@@ -56,6 +56,7 @@ export const skipRoundFunction = functions
       const isNextRound = shouldUpdateRound(updatedGame);
       if (isNextRound) {
         updatedGame.round += 1;
+        updatedGame.activePlayerId = getNextPlayerId(updatedGame)
       }
 
       await admin.firestore()

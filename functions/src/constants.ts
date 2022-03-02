@@ -61,3 +61,11 @@ export const shouldUpdateRound = (game: GameData): boolean => {
   });
   return playersInRound.length === 1;
 };
+
+export const getNextPlayerId = (game: GameData): string => {
+  const playerIndex = game.playerIds.indexOf(game.activePlayerId);
+  const nextPlayerIdx = playerIndex === game.playerIds.length -1 ?
+    0 :
+    playerIndex + 1;
+  return game.playerIds[nextPlayerIdx];
+}

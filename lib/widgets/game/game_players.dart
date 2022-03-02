@@ -27,6 +27,7 @@ class GamePlayers extends StatelessWidget {
             nickname: player.nickname,
             isActive: isActive,
             isMe: userId == id,
+            isSkipped: player.round > game.round,
           ),
         );
       }

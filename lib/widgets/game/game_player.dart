@@ -26,7 +26,12 @@ class GamePlayer extends StatelessWidget {
       child: SizedBox(
         height: 50,
         child: Card(
-          color: isActive ? activeColor : null,
+          shadowColor: isSkipped ? Colors.transparent : null,
+          color: isSkipped
+              ? theme.disabledColor.withOpacity(0.1)
+              : isActive
+                  ? activeColor
+                  : null,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -37,7 +42,11 @@ class GamePlayer extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: isActive ? theme.colorScheme.onSecondary : null,
+                    color: isSkipped
+                        ? theme.disabledColor
+                        : isActive
+                            ? theme.colorScheme.onSecondary
+                            : null,
                   ),
                 ),
               ),
@@ -45,7 +54,11 @@ class GamePlayer extends StatelessWidget {
                 '$cards cards',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: isActive ? theme.colorScheme.onSecondary : null,
+                  color: isSkipped
+                      ? theme.disabledColor
+                      : isActive
+                          ? theme.colorScheme.onSecondary
+                          : null,
                 ),
               )
             ],

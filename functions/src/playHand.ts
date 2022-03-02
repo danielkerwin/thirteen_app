@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {Card, PlayerData} from "./interfaces";
-import {getGameData} from "./constants";
+import {getGameData, getNextPlayerId} from "./constants";
 
 const isCardBetter = (prev: Card, current: Card) => {
   if (current.value === prev.value) {
@@ -59,11 +59,7 @@ export const playHandFunction = functions
             });
 
         // update next player
-        const playerIndex = gameData.playerIds.indexOf(uid);
-        const nextPlayerIdx = playerIndex === gameData.playerIds.length -1 ?
-          0 :
-          playerIndex + 1;
-        const nextPlayerId = gameData.playerIds[nextPlayerIdx];
+        const nextPlayerId = getNextPlayerId(gameData);
         const player = gameData.players[uid];
         player.cardCount -= currentMove.length;
         const gamePromise = admin.firestore().doc(`games/${gameId}`).set(

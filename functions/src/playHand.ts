@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {Card, PlayerData} from "./interfaces";
-import {getGameData, getNextPlayerId} from "./constants";
+import {getGameData, updateGame} from "./constants";
 
 const isCardBetter = (prev: Card, current: Card) => {
   if (current.value === prev.value) {
@@ -58,14 +58,11 @@ export const playHandFunction = functions
               round: gameData.round,
             });
 
-        // update next player
-        const nextPlayerId = getNextPlayerId(gameData);
-        const player = gameData.players[uid];
-        player.cardCount -= currentMove.length;
-        const gamePromise = admin.firestore().doc(`games/${gameId}`).set(
-            {activePlayerId: nextPlayerId, players: {[uid]: player}},
-            {merge: true},
-        );
+        // update game
+        const updatedGameData = updateGame(gameData, currentMove.length);
+        const updateGamePromise = admin.firestore()
+          .doc(`games/${gameId}`)
+          .set(updatedGameData);
 
         // remove cards from hand
         const playerRef = await admin.firestore()
@@ -84,7 +81,7 @@ export const playHandFunction = functions
             .update(playerDoc);
 
         // execute all promises
-        await Promise.all([movePromise, gamePromise, playerPromise]);
+        await Promise.all([movePromise, updateGamePromise, playerPromise]);
         return true;
       }
 

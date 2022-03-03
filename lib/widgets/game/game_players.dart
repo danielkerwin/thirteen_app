@@ -23,7 +23,8 @@ class GamePlayers extends StatelessWidget {
       if (player != null) {
         gamePlayers.add(
           GamePlayer(
-            cards: player.cardCount,
+            rank: game.rankIds.indexOf(id),
+            cardCount: player.cardCount,
             nickname: player.nickname,
             isActive: isActive,
             isMe: userId == id,

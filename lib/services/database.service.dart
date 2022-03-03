@@ -61,6 +61,7 @@ class DatabaseService {
       },
       'rules': {},
       'round': 1,
+      'rankIds': [],
     });
   }
 

@@ -1,4 +1,4 @@
-import {Card, GameData} from "./interfaces";
+import {Card, GameData, GameStatus} from "./interfaces";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
@@ -54,14 +54,6 @@ export const getGameData = async (
   return game.data() as GameData;
 };
 
-export const shouldUpdateRound = (game: GameData): boolean => {
-  const playersInRound = game.playerIds.filter((id) => {
-    const player = game.players[id];
-    return player.round <= game.round || player.cardCount === 0;
-  });
-  return playersInRound.length === 1;
-};
-
 export const getNextPlayerId = (game: GameData): string => {
   const playerIndex = game.playerIds.indexOf(game.activePlayerId);
   const nextPlayerIdx = playerIndex === game.playerIds.length -1 ?
@@ -69,3 +61,50 @@ export const getNextPlayerId = (game: GameData): string => {
     playerIndex + 1;
   return game.playerIds[nextPlayerIdx];
 };
+
+export const updateGame = (
+  game: GameData,
+  cardsPlayed: number,
+  isSkipping: boolean = false
+): GameData => {
+
+  // update card count
+  const player = game.players[game.activePlayerId];
+  player.cardCount -= cardsPlayed;
+
+  // add user to game ranking if they're finished
+  if (player.cardCount === 0) {
+    game.rankIds.push(game.activePlayerId);
+  }
+
+  // skip round if applicable
+  if (isSkipping) {
+    player.round = game.round + 1;
+  }
+
+  // check if game is over
+  if (game.rankIds.length === game.playerIds.length - 1) {
+    game.status = GameStatus.completed;
+  }
+
+  // check if round is over
+  if (game.status !== GameStatus.completed) {
+
+    // check for active players
+    const playersInRound = game.playerIds.filter((id) => {
+      const player = game.players[id];
+      return player.round <= game.round || player.cardCount > 0;
+    });
+
+    // increment next round
+    if (playersInRound.length === 1) {
+      game.round += 1;
+    }
+
+    // activate next player
+    game.activePlayerId = getNextPlayerId(game);
+
+  }
+  return game;
+};
+

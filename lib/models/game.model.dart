@@ -15,6 +15,7 @@ class Game {
   final GameStatus status;
   final Map<String, PlayerInfo> players;
   final int round;
+  final List<String> rankIds;
 
   Game({
     required this.status,
@@ -26,6 +27,7 @@ class Game {
     required this.playerIds,
     required this.players,
     required this.round,
+    required this.rankIds,
   });
 
   bool get isCreatedByMe {
@@ -80,6 +82,7 @@ class Game {
       players: {},
       status: GameStatus.created,
       round: 1,
+      rankIds: [],
     );
   }
 
@@ -88,6 +91,7 @@ class Game {
     final status = _getStatus(gameData['status'] ?? 0);
     Map<String, dynamic> players = gameData['players'] ?? {};
     List<dynamic> playerIds = gameData['playerIds'] ?? [];
+    List<dynamic> rankIds = gameData['rankIds'] ?? [];
     Timestamp createdAt = gameData['createdAt'] ?? Timestamp.now();
     return Game(
       id: doc.id,
@@ -108,6 +112,7 @@ class Game {
       }),
       status: status,
       round: gameData['round'] ?? 1,
+      rankIds: rankIds.map((id) => id.toString()).toList(),
     );
   }
 }

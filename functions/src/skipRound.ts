@@ -1,7 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {getGameData, getNextPlayerId, shouldUpdateRound} from "./constants";
-import {GameData, PlayerInfo, Players} from "./interfaces";
+import {getGameData, updateGame} from "./constants";
 
 const funcName = "skipRound";
 
@@ -42,26 +41,11 @@ export const skipRoundFunction = functions
           {uid, gameId, round: gameData.round},
       );
 
-      const playerInfo: PlayerInfo = {
-        ...gameData?.players[uid],
-        round: gameData.round + 1,
-      };
-
-      const players: Players = {...gameData.players, [uid]: playerInfo};
-      const updatedGame: GameData = {
-        ...gameData,
-        players,
-      };
-
-      const isNextRound = shouldUpdateRound(updatedGame);
-      if (isNextRound) {
-        updatedGame.round += 1;
-        updatedGame.activePlayerId = getNextPlayerId(updatedGame);
-      }
+      const updatedGameData = updateGame(gameData, 0, true);
 
       await admin.firestore()
           .doc(`/games/${gameId}`)
-          .set(updatedGame);
+          .set(updatedGameData);
 
       return true;
     });

@@ -1,5 +1,11 @@
 import * as admin from "firebase-admin";
 
+export enum GameStatus {
+  created,
+  active,
+  completed,
+}
+
 export interface Card {
   suit: number;
   value: number;
@@ -25,8 +31,9 @@ export interface GameData {
   createdById: string;
   createdByName: string;
   playerIds: string[];
+  rankIds: string[];
   players: Players;
   rules: Record<string, unknown>;
-  status: number;
+  status: GameStatus;
   round: number;
 }

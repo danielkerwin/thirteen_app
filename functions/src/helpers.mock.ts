@@ -1,27 +1,23 @@
-import { GameData, GameStatus, PlayerInfo, Players } from "./interfaces";
-import * as admin from "firebase-admin";
+import { GameData, GameStatus, PlayerInfo, Players } from './interfaces';
+import * as admin from 'firebase-admin';
 
 export class PlayerInfoMock implements PlayerInfo {
   constructor(
     public cardCount: number,
     public nickname: string,
-    public round: number
-  ) {};
+    public round: number,
+  ) {}
 }
-
 
 export class GameDataMock implements GameData {
   activePlayerId = 'J679XHaBFsgE7q8hUl1Ybhd9yKh2';
   createdAt = admin.firestore.Timestamp.now();
   createdById = 'XtGDSI5lfrV9zdr7MDXtjUCjRpk1';
   createdByName = 'Dan';
-  playerIds = [
-    'J679XHaBFsgE7q8hUl1Ybhd9yKh2',
-    'XtGDSI5lfrV9zdr7MDXtjUCjRpk1',
-  ];
+  playerIds = ['J679XHaBFsgE7q8hUl1Ybhd9yKh2', 'XtGDSI5lfrV9zdr7MDXtjUCjRpk1'];
   players: Players = {
-    J679XHaBFsgE7q8hUl1Ybhd9yKh2: new PlayerInfoMock(2, "Dan", 1),
-    XtGDSI5lfrV9zdr7MDXtjUCjRpk1: new PlayerInfoMock(4, "Amy", 1)
+    J679XHaBFsgE7q8hUl1Ybhd9yKh2: new PlayerInfoMock(2, 'Dan', 1),
+    XtGDSI5lfrV9zdr7MDXtjUCjRpk1: new PlayerInfoMock(4, 'Amy', 1),
   };
   rankIds: string[] = [];
   round = 1;

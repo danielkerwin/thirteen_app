@@ -1,46 +1,40 @@
-import {GameData, GameStatus} from "./interfaces";
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
+import { GameData, GameStatus } from './interfaces';
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 
 export const getGameData = async (
-    funcName: string,
-    gameId: string,
-    context: functions.https.CallableContext
+  funcName: string,
+  gameId: string,
+  context: functions.https.CallableContext,
 ): Promise<GameData> => {
   if (!context.auth) {
-    const message = "User not authenticated";
+    const message = 'User not authenticated';
     functions.logger.info(`${funcName}: ${message}`);
-    throw new functions.https.HttpsError(
-        "unauthenticated",
-        message,
-    );
+    throw new functions.https.HttpsError('unauthenticated', message);
   }
   const uid = context.auth.uid;
 
   if (!gameId) {
-    const message = "Missing Game ID";
-    functions.logger.info(`${funcName}: ${message}`, {uid, gameId});
-    throw new functions.https.HttpsError(
-        "invalid-argument",
-        message,
-    );
+    const message = 'Missing Game ID';
+    functions.logger.info(`${funcName}: ${message}`, { uid, gameId });
+    throw new functions.https.HttpsError('invalid-argument', message);
   }
 
   const game = await admin.firestore().doc(`games/${gameId}`).get();
 
   if (!game.exists) {
-    const message = "Game does not exist";
-    functions.logger.info(`${funcName} ${gameId}: ${message}`, {uid, gameId});
-    throw new functions.https.HttpsError(
-        "not-found",
-        message,
-    );
+    const message = 'Game does not exist';
+    functions.logger.info(`${funcName} ${gameId}: ${message}`, { uid, gameId });
+    throw new functions.https.HttpsError('not-found', message);
   }
 
   return game.data() as GameData;
 };
 
-export const getNextPlayerId = (game: GameData, playersInRound: string[]): string => {
+export const getNextPlayerId = (
+  game: GameData,
+  playersInRound: string[],
+): string => {
   const playerIndex = game.playerIds.indexOf(game.activePlayerId);
   if (playerIndex > playersInRound.length - 1) {
     return playersInRound[0];
@@ -49,9 +43,9 @@ export const getNextPlayerId = (game: GameData, playersInRound: string[]): strin
 };
 
 export const updateGame = (
-    game: GameData,
-    cardsPlayed: number,
-    isSkipping = false
+  game: GameData,
+  cardsPlayed: number,
+  isSkipping = false,
 ): GameData => {
   // update card count
   const player = game.players[game.activePlayerId];
@@ -90,4 +84,3 @@ export const updateGame = (
   }
   return game;
 };
-

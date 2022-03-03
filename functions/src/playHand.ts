@@ -61,8 +61,8 @@ export const playHandFunction = functions
         // update game
         const updatedGameData = updateGame(gameData, currentMove.length);
         const updateGamePromise = admin.firestore()
-          .doc(`games/${gameId}`)
-          .set(updatedGameData);
+            .doc(`games/${gameId}`)
+            .set(updatedGameData);
 
         // remove cards from hand
         const playerRef = await admin.firestore()

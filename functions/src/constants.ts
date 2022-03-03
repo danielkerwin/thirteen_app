@@ -63,11 +63,10 @@ export const getNextPlayerId = (game: GameData): string => {
 };
 
 export const updateGame = (
-  game: GameData,
-  cardsPlayed: number,
-  isSkipping: boolean = false
+    game: GameData,
+    cardsPlayed: number,
+    isSkipping = false
 ): GameData => {
-
   // update card count
   const player = game.players[game.activePlayerId];
   player.cardCount -= cardsPlayed;
@@ -89,7 +88,6 @@ export const updateGame = (
 
   // check if round is over
   if (game.status !== GameStatus.completed) {
-
     // check for active players
     const playersInRound = game.playerIds.filter((id) => {
       const player = game.players[id];
@@ -103,7 +101,6 @@ export const updateGame = (
 
     // activate next player
     game.activePlayerId = getNextPlayerId(game);
-
   }
   return game;
 };

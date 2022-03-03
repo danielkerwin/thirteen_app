@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {cards, getGameData} from "./constants";
+import * as helpers from "./helpers";
+import {cards} from "./constants";
 import {shuffle} from "lodash";
 import {Card} from "./interfaces";
 
@@ -19,7 +20,7 @@ export const startGameFunction = functions
     .onCall(async (data, context) => {
       const uid = context.auth?.uid ?? "unknown";
       const gameId = data.gameId;
-      const gameData = await getGameData(funcName, gameId, context);
+      const gameData = await helpers.getGameData(funcName, gameId, context);
 
       const playerIds: string[] = gameData?.playerIds ?? [];
 

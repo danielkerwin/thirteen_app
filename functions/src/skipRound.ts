@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {getGameData, updateGame} from "./constants";
+import * as helpers from "./helpers";
 
 const funcName = "skipRound";
 
@@ -10,7 +10,7 @@ export const skipRoundFunction = functions
     .onCall(async (data, context) => {
       const uid = context.auth?.uid ?? "unknown";
       const gameId = data.gameId;
-      const gameData = await getGameData(funcName, gameId, context);
+      const gameData = await helpers.getGameData(funcName, gameId, context);
 
       if (gameData.activePlayerId !== uid) {
         const message = "Not the active player";
@@ -41,7 +41,7 @@ export const skipRoundFunction = functions
           {uid, gameId, round: gameData.round},
       );
 
-      const updatedGameData = updateGame(gameData, 0, true);
+      const updatedGameData = helpers.updateGame(gameData, 0, true);
 
       await admin.firestore()
           .doc(`/games/${gameId}`)

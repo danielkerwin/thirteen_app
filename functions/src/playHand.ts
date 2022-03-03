@@ -1,7 +1,7 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {Card, PlayerData} from "./interfaces";
-import {getGameData, updateGame} from "./constants";
+import * as helpers from "./helpers";
 
 const isCardBetter = (prev: Card, current: Card) => {
   if (current.value === prev.value) {
@@ -18,7 +18,7 @@ export const playHandFunction = functions
     .onCall(async (data, context) => {
       const uid = context.auth?.uid ?? "unknown";
       const gameId = data.gameId;
-      const gameData = await getGameData(funcName, gameId, context);
+      const gameData = await helpers.getGameData(funcName, gameId, context);
 
       if (!gameData || gameData.activePlayerId !== uid) {
         const message = "Not the active player";
@@ -59,7 +59,7 @@ export const playHandFunction = functions
             });
 
         // update game
-        const updatedGameData = updateGame(gameData, currentMove.length);
+        const updatedGameData = helpers.updateGame(gameData, currentMove.length);
         const updateGamePromise = admin.firestore()
             .doc(`games/${gameId}`)
             .set(updatedGameData);

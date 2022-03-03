@@ -56,9 +56,11 @@ class DatabaseService {
         userId: {
           'cardCount': 0,
           'nickname': nickname,
+          'round': 1,
         },
       },
       'rules': {},
+      'round': 1,
     });
   }
 

@@ -68,4 +68,4 @@ export const getNextPlayerId = (game: GameData): string => {
     0 :
     playerIndex + 1;
   return game.playerIds[nextPlayerIdx];
-}
+};

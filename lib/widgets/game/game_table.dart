@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/game.model.dart';
 import '../../models/game_card.model.dart';
 import '../../models/moves.model.dart';
 import 'game_card_item.dart';
@@ -54,6 +55,10 @@ class GameTable extends StatelessWidget {
     ).toList();
   }
 
+  List<GameMoves> _filterRound(Game game, List<GameMoves> moves) {
+    return moves.where((move) => move.round >= game.round).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -61,9 +66,14 @@ class GameTable extends StatelessWidget {
     print('building game_table');
 
     final moves = Provider.of<List<GameMoves>>(context);
+    final game = Provider.of<Game>(context);
 
-    List<GameCard> previousCards = moves.length > 1 ? moves[1].cards : [];
-    List<GameCard> latestCards = moves.isNotEmpty ? moves[0].cards : [];
+    final roundMoves = _filterRound(game, moves);
+
+    List<GameCard> previousCards =
+        roundMoves.length > 1 ? roundMoves[1].cards : [];
+    List<GameCard> latestCards =
+        roundMoves.isNotEmpty ? roundMoves[0].cards : [];
 
     return Container(
       width: mediaQuery.size.width * 0.6,

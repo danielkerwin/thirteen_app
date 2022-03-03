@@ -50,13 +50,13 @@ export const skipRoundFunction = functions
       const players: Players = {...gameData.players, [uid]: playerInfo};
       const updatedGame: GameData = {
         ...gameData,
-        ...players,
+        players,
       };
 
       const isNextRound = shouldUpdateRound(updatedGame);
       if (isNextRound) {
         updatedGame.round += 1;
-        updatedGame.activePlayerId = getNextPlayerId(updatedGame)
+        updatedGame.activePlayerId = getNextPlayerId(updatedGame);
       }
 
       await admin.firestore()

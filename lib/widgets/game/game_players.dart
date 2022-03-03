@@ -45,6 +45,7 @@ class GamePlayers extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: buildPlayers(game),
         ),
+        Text('Round ${game.round}')
       ],
     );
   }

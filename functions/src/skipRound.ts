@@ -20,7 +20,7 @@ export const skipRoundFunction = functions
       throw new functions.https.HttpsError('invalid-argument', message);
     }
 
-    if (gameData.round !== gameData.players[uid].round) {
+    if (gameData.players[uid].round > gameData.round) {
       const message = 'Already skipped this round';
       functions.logger.info(`${funcName} ${gameId}: ${message}`, {
         uid,
@@ -31,7 +31,7 @@ export const skipRoundFunction = functions
 
     functions.logger.info(
       `${funcName} ${gameId}: skipping round ${gameData.round}`,
-      { uid, gameId, round: gameData.round }
+      { uid, gameId, round: gameData.round },
     );
 
     const updatedGameData = helpers.updateGame(gameData, 0, true);

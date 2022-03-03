@@ -35,11 +35,15 @@ export const getNextPlayerId = (
   game: GameData,
   playersInRound: string[],
 ): string => {
-  const playerIndex = game.playerIds.indexOf(game.activePlayerId);
-  if (playerIndex > playersInRound.length - 1) {
+  const activeIndex = game.playerIds.indexOf(game.activePlayerId);
+  const nextIndex =
+    playersInRound.length < game.playerIds.length
+      ? activeIndex
+      : activeIndex + 1;
+  if (nextIndex > playersInRound.length - 1) {
     return playersInRound[0];
   }
-  return playersInRound[playerIndex];
+  return playersInRound[nextIndex];
 };
 
 export const updateGame = (
@@ -57,7 +61,7 @@ export const updateGame = (
   }
 
   // skip round if applicable
-  if (isSkipping) {
+  if (isSkipping && player.round <= game.round) {
     player.round = game.round + 1;
   }
 

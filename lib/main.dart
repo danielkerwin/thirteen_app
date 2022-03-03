@@ -1,5 +1,6 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:cloud_functions/cloud_functions.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -57,12 +58,22 @@ class MyApp extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnapshot) {
         final isDarkMode = prefs.getBool('isDarkMode') ?? false;
-        return StreamProvider<UserData>.value(
-          initialData: UserData.fromEmpty(isDarkMode),
-          value: DatabaseService.getUserStream(
-            authSnapshot.data?.uid,
-            isDarkMode,
-          ),
+        return MultiProvider(
+          providers: [
+            StreamProvider<UserData>.value(
+              initialData: UserData.fromEmpty(isDarkMode),
+              value: DatabaseService.getUserStream(
+                authSnapshot.data?.uid,
+                isDarkMode,
+              ),
+            ),
+            Provider<AudioCache>(
+              create: (_) => AudioCache(
+                prefix: 'assets/audio/',
+                respectSilence: true,
+              ),
+            )
+          ],
           child: Consumer<UserData>(
             builder: (_, userData, __) {
               if (authSnapshot.hasData && userData.uid.isEmpty) {

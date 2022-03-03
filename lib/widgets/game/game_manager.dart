@@ -1,11 +1,12 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/audio.constant.dart';
 import '../../helpers/helpers.dart';
 import '../../models/game.model.dart';
 import '../../services/database.service.dart';
-import 'game_error.dart';
 
 class GameManager extends StatefulWidget {
   final String gameId;
@@ -22,6 +23,7 @@ class GameManager extends StatefulWidget {
 }
 
 class _GameManagerState extends State<GameManager> {
+  bool _isComplete = false;
   bool _isLoading = false;
 
   Future<void> _joinGame() async {
@@ -46,17 +48,21 @@ class _GameManagerState extends State<GameManager> {
   }
 
   Future<void> _startGame() async {
+    final audio = Provider.of<AudioCache>(context, listen: false);
     setState(() => _isLoading = true);
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     try {
       await DatabaseService.startGame(widget.gameId);
+      await audio.play(Audio.startGame);
       messenger.showSnackBar(Helpers.getSnackBar('Game started!'));
     } on FirebaseFunctionsException catch (err) {
+      await audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar(err.message ?? 'Failed to start game'),
       );
     } catch (err) {
+      await audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar('Unknown error occurred'),
       );
@@ -65,28 +71,62 @@ class _GameManagerState extends State<GameManager> {
     setState(() => _isLoading = false);
   }
 
+  Future<void> _checkGameStatus(Game game) async {
+    if (!_isComplete && game.isComplete) {
+      _isComplete = true;
+      final audio = Provider.of<AudioCache>(context);
+      if (game.isWinner) {
+        await audio.play(Audio.gameWin);
+      } else {
+        await audio.play(Audio.gameLost);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print('building game_manager');
-    final theme = Theme.of(context);
     final game = Provider.of<Game>(context);
 
+    _checkGameStatus(game);
+
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        if (!game.isJoined)
+        if (!game.isJoined && game.isCreated)
           ElevatedButton(
             child: _isLoading
                 ? const CircularProgressIndicator.adaptive()
                 : const Text('Join Game'),
             onPressed: _isLoading ? null : _joinGame,
           ),
-        if (game.isCreatedByMe && game.status == GameStatus.created)
+        if (game.isCreatedByMe && game.isCreated)
           Center(
             child: ElevatedButton(
               child: _isLoading
                   ? const CircularProgressIndicator.adaptive()
                   : const Text('Start game'),
               onPressed: _isLoading ? null : _startGame,
+            ),
+          ),
+        if (game.isComplete)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                const Text(
+                  'Game over',
+                  style: TextStyle(fontSize: 17),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  '${game.winningPlayerName} wins',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+              ],
             ),
           )
       ],

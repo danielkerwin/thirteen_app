@@ -1,9 +1,9 @@
-import 'dart:math';
-
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../constants/audio.constant.dart';
 import '../../helpers/helpers.dart';
 import '../../models/game.model.dart';
 import '../../models/game_card.model.dart';
@@ -28,7 +28,9 @@ class _GameHandState extends State<GameHand> {
   final Set<String> _selectedCards = {};
   bool _isLoading = false;
 
-  void _toggleCardSelection(String id) {
+  void _toggleCardSelection(String id) async {
+    final audio = Provider.of<AudioCache>(context, listen: false);
+    audio.play(Audio.selectCard);
     setState(() {
       if (_selectedCards.contains(id)) {
         _selectedCards.remove(id);
@@ -39,6 +41,7 @@ class _GameHandState extends State<GameHand> {
   }
 
   void _playSelectedCards(Game game) async {
+    final audio = Provider.of<AudioCache>(context, listen: false);
     if (_selectedCards.isEmpty) {
       return;
     }
@@ -48,6 +51,7 @@ class _GameHandState extends State<GameHand> {
 
     if (!game.isActivePlayer) {
       final activePlayer = game.activePlayerName;
+      await audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar(
           'You\'re not the active player - it\'s $activePlayer\'s turn',
@@ -63,15 +67,17 @@ class _GameHandState extends State<GameHand> {
 
     try {
       await DatabaseService.playHand(widget.gameId, cardsToPlay);
+      await audio.play(Audio.playCardSuccess);
       setState(() {
-        // widget.cards.removeWhere((card) => _selectedCards.contains(card.id));
         _selectedCards.clear();
       });
     } on FirebaseFunctionsException catch (err) {
+      await audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar(err.message ?? 'Failed to play hand'),
       );
     } catch (err) {
+      await audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar('Unknown error occurred'),
       );
@@ -180,6 +186,17 @@ class _GameHandState extends State<GameHand> {
     });
   }
 
+  bool _canSkip(Game game) {
+    return game.isActivePlayer &&
+        !game.isSkippedRound &&
+        !_isLoading &&
+        game.isActive;
+  }
+
+  bool _canPlay(Game game) {
+    return _selectedCards.isNotEmpty && !_isLoading && game.isActive;
+  }
+
   @override
   Widget build(BuildContext context) {
     print('Building game_hand');
@@ -205,7 +222,7 @@ class _GameHandState extends State<GameHand> {
                 ),
               ),
               if (_isLoading)
-                CircularProgressIndicator(
+                CircularProgressIndicator.adaptive(
                   backgroundColor: theme.primaryColor,
                 )
             ],
@@ -215,9 +232,7 @@ class _GameHandState extends State<GameHand> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             ElevatedButton(
-              onPressed: !game.isActivePlayer || game.isSkippedRound
-                  ? null
-                  : () => _skipRound(game),
+              onPressed: _canSkip(game) ? () => _skipRound(game) : null,
               child: const Text('Skip'),
               style: ElevatedButton.styleFrom(
                 primary: theme.colorScheme.secondary,
@@ -227,9 +242,8 @@ class _GameHandState extends State<GameHand> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: _selectedCards.isEmpty || _isLoading
-                      ? null
-                      : () => _playSelectedCards(game),
+                  onPressed:
+                      _canPlay(game) ? () => _playSelectedCards(game) : null,
                   child: Text('Play ${_selectedCards.length} selected'),
                   style: ElevatedButton.styleFrom(
                       // primary: theme.primaryColor,

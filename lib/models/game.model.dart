@@ -45,6 +45,11 @@ class Game {
     return activePlayerId == userId;
   }
 
+  bool get isWinner {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    return rankIds.isNotEmpty ? rankIds[0] == userId : false;
+  }
+
   bool get isSkippedRound {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     return (players[userId]?.round ?? 0) > round;
@@ -52,6 +57,18 @@ class Game {
 
   bool get isActive {
     return status == GameStatus.active;
+  }
+
+  bool get isCreated {
+    return status == GameStatus.created;
+  }
+
+  bool get isComplete {
+    return status == GameStatus.complete;
+  }
+
+  String get winningPlayerName {
+    return players[rankIds[0]]?.nickname ?? 'someone';
   }
 
   String get activePlayerName {

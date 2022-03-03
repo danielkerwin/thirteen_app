@@ -1,6 +1,7 @@
 import * as helpers from './helpers';
 import { CardsMock, GameDataMock, PlayerInfoMock } from './helpers.mock';
 import { GameStatus } from './interfaces';
+import * as constants from './constants';
 
 describe('updateGame', () => {
   // beforeEach(() => {});
@@ -209,7 +210,7 @@ describe('isValidMove', () => {
     const a3 = [new CardsMock(8, 2)];
     const b3 = [new CardsMock(8, 3)];
 
-    const message = 'Cards are not better';
+    const message = constants.moveErrors.sameValueNotBetter(1);
 
     expect(helpers.isValidMove(a1, b1)).toBe(message);
     expect(helpers.isValidMove(a2, b2)).toBe(message);
@@ -250,7 +251,7 @@ describe('isValidMove', () => {
     const a2 = [new CardsMock(5, 3), new CardsMock(6, 0)];
     const a3 = [new CardsMock(8, 3), new CardsMock(4, 1)];
 
-    const message = 'Cards are not same value or in sequence';
+    const message = constants.moveErrors.notRunNotSame;
 
     expect(helpers.isValidMove(a1)).toBe(message);
     expect(helpers.isValidMove(a2)).toBe(message);
@@ -267,7 +268,7 @@ describe('isValidMove', () => {
     const a3 = [new CardsMock(9, 3), new CardsMock(9, 1)];
     const b3 = [new CardsMock(8, 2), new CardsMock(8, 0)];
 
-    const message = 'Cards are not better';
+    const message = constants.moveErrors.sameValueNotBetter(2);
 
     expect(helpers.isValidMove(b1, a1)).toBe(message);
     expect(helpers.isValidMove(b2, a2)).toBe(message);
@@ -291,7 +292,7 @@ describe('isValidMove', () => {
     const a2 = [new CardsMock(5, 3), new CardsMock(4, 0), new CardsMock(5, 1)];
     const a3 = [new CardsMock(8, 3), new CardsMock(1, 1), new CardsMock(8, 2)];
 
-    const message = 'Cards are not same value or in sequence';
+    const message = constants.moveErrors.notRunNotSame;
 
     expect(helpers.isValidMove(a1)).toBe(message);
     expect(helpers.isValidMove(a2)).toBe(message);
@@ -315,16 +316,25 @@ describe('isValidMove', () => {
 
   it('should be a invalid triple from previous', () => {
     const a1 = [new CardsMock(2, 1), new CardsMock(2, 3), new CardsMock(2, 2)];
-    const b1 = [new CardsMock(1, 1), new CardsMock(1, 3), new CardsMock(1, 2)];
+    const b1 = [
+      new CardsMock(1, 1),
+      new CardsMock(1, 3),
+      new CardsMock(1, 2),
+      new CardsMock(1, 0),
+    ];
     const a2 = [new CardsMock(5, 3), new CardsMock(5, 0), new CardsMock(5, 1)];
     const b2 = [new CardsMock(2, 3), new CardsMock(2, 0), new CardsMock(2, 1)];
-    const a3 = [new CardsMock(8, 3), new CardsMock(8, 1), new CardsMock(8, 2)];
+    const a3 = [new CardsMock(8, 3), new CardsMock(8, 1)];
     const b3 = [new CardsMock(5, 3), new CardsMock(5, 1), new CardsMock(5, 2)];
 
-    const message = 'Cards are not better';
-
-    expect(helpers.isValidMove(b1, a1)).toBe(message);
-    expect(helpers.isValidMove(b2, a2)).toBe(message);
-    expect(helpers.isValidMove(b3, a3)).toBe(message);
+    expect(helpers.isValidMove(b1, a1)).toBe(
+      constants.moveErrors.wrongAmount(3),
+    );
+    expect(helpers.isValidMove(b2, a2)).toBe(
+      constants.moveErrors.sameValueNotBetter(3),
+    );
+    expect(helpers.isValidMove(b3, a3)).toBe(
+      constants.moveErrors.wrongAmount(2),
+    );
   });
 });

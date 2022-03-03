@@ -125,6 +125,19 @@ export const isSequence = (cards: Card[]): boolean => {
   });
 };
 
+export const getSameValueType = (length: number): string => {
+  switch (length) {
+    case 1:
+      return 'Your single is not better';
+    case 2:
+      return 'Your doubles are not better';
+    case 3:
+      return 'Your triples are not better';
+    default:
+      return 'Your cards are not better';
+  }
+};
+
 export const isValidMove = (
   current: Card[],
   previous: Card[] = [],
@@ -132,18 +145,26 @@ export const isValidMove = (
   const cards = current.sort(cardSorter);
   const prev = previous.sort(cardSorter);
 
-  if (prev.length && !isLastCardBetter(cards, prev)) {
-    return 'Cards are not better';
+  if (prev.length && prev.length !== cards.length) {
+    return `Wrong amount of cards (expected ${prev.length})`;
   }
 
-  if (cards.length > 1) {
-    if (isSameValue(cards)) {
-      return null;
-    } else if (isSequence(cards)) {
-      return null;
-    } else {
-      return 'Cards are not same value or in sequence';
+  if (isSameValue(cards)) {
+    if (prev.length && isSequence(prev)) {
+      return 'Your cards must be in a run';
     }
+    if (prev.length && !isLastCardBetter(cards, prev)) {
+      return getSameValueType(cards.length);
+    }
+  } else if (isSequence(cards)) {
+    if (prev.length && isSameValue(prev)) {
+      return 'Your cards must be same value';
+    }
+    if (prev.length && !isLastCardBetter(cards, prev)) {
+      return 'Your run is not better';
+    }
+  } else {
+    return 'Your cards are neither same value nor in sequence';
   }
 
   return null;

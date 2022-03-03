@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.thirteen_app">
+    package="com.danielkerwin.thirteen">
+   <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="thirteen_app"
+        android:label="Thirteen!"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

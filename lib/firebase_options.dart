@@ -61,7 +61,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '242888687377',
     projectId: 'thirteen-app',
     storageBucket: 'thirteen-app.appspot.com',
-    iosClientId: '242888687377-9808fbv5grknpvskoskslr0pbuj4n4om.apps.googleusercontent.com',
-    iosBundleId: 'com.example.thirteenApp',
+    iosClientId:
+        '242888687377-9808fbv5grknpvskoskslr0pbuj4n4om.apps.googleusercontent.com',
+    iosBundleId: 'com.danielkerwin.thirteen',
   );
 }

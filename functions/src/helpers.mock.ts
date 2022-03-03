@@ -1,4 +1,4 @@
-import { GameData, GameStatus, PlayerInfo, Players } from './interfaces';
+import { Card, GameData, GameStatus, PlayerInfo, Players } from './interfaces';
 import * as admin from 'firebase-admin';
 
 export class PlayerInfoMock implements PlayerInfo {
@@ -35,4 +35,8 @@ export class GameDataMock implements GameData {
     this.rules = options?.rules ?? this.rules;
     this.status = options?.status ?? this.status;
   }
+}
+
+export class CardsMock implements Card {
+  constructor(public value: number, public suit: number) {}
 }

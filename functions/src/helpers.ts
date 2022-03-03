@@ -1,4 +1,4 @@
-import { GameData, GameStatus } from './interfaces';
+import { Card, GameData, GameStatus } from './interfaces';
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
@@ -87,4 +87,64 @@ export const updateGame = (
     game.activePlayerId = getNextPlayerId(game, playersInRound);
   }
   return game;
+};
+
+export const cardSorter = (a: Card, b: Card): number => {
+  if (a.value == b.value) {
+    return a.suit - b.suit;
+  }
+  return a.value - b.value;
+};
+
+export const isLastCardBetter = (
+  currentCards: Card[],
+  prevCards: Card[],
+): boolean => {
+  const current = currentCards[currentCards.length - 1];
+  const prev = prevCards[prevCards.length - 1];
+  if (current.value === prev.value) {
+    return current.suit > prev.suit;
+  }
+  return current.value > prev.value;
+};
+
+export const isSameValue = (cards: Card[]): boolean => {
+  const value = cards[0]?.value || 0;
+  return cards.every((card) => card.value === value);
+};
+
+export const isSequence = (cards: Card[]): boolean => {
+  if (cards.length < 3) {
+    return false;
+  }
+  let value = cards[0]?.value - 1 || 0;
+  return cards.every((card) => {
+    const isSequence = card.value === value + 1;
+    value += 1;
+    return isSequence;
+  });
+};
+
+export const isValidMove = (
+  current: Card[],
+  previous: Card[] = [],
+): string | null => {
+  const cards = current.sort(cardSorter);
+  const prev = previous.sort(cardSorter);
+
+  if (prev.length && !isLastCardBetter(cards, prev)) {
+    return 'Cards are not better';
+  }
+
+  if (cards.length > 1) {
+    if (isSameValue(cards)) {
+      return null;
+    } else if (isSequence(cards)) {
+      return null;
+    } else {
+      return 'Cards are not same value or in sequence';
+    }
+  }
+
+  return null;
 };

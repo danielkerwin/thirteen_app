@@ -1,14 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { Card, PlayerData } from './interfaces';
+import { Card, Move, PlayerData } from './interfaces';
 import * as helpers from './helpers';
-
-const isCardBetter = (prev: Card, current: Card) => {
-  if (current.value === prev.value) {
-    return current.suit > prev.suit;
-  }
-  return current.value > prev.value;
-};
 
 const funcName = 'playHand';
 
@@ -28,15 +21,11 @@ export const playHandFunction = functions
       throw new functions.https.HttpsError('invalid-argument', message);
     }
 
-    const currentMove: Card[] = data.cards;
+    const currentCards: Card[] = data.cards;
     functions.logger.info(`${funcName} ${gameId}: got cards to play`, {
       uid,
       gameId,
-      currentMove,
-    });
-
-    currentMove.sort((a, b) => {
-      return a.value - b.value || a.suit - b.suit;
+      currentCards,
     });
 
     const moves = await admin
@@ -46,127 +35,74 @@ export const playHandFunction = functions
       .limit(1)
       .get();
 
-    // TODO: TEMP ALLOW ALL MOVES
-    if (gameId) {
-      // add move to stack
-      const movePromise = admin
-        .firestore()
-        .collection(`games/${gameId}/moves`)
-        .doc()
-        .set({
-          createdAt: admin.firestore.Timestamp.now(),
-          cards: currentMove,
-          round: gameData.round,
-        });
+    const previousMove = moves.empty
+      ? []
+      : (moves.docs.map((move) => move.data()) as Move[]);
+    const roundMoves = previousMove.filter(
+      (move) => move.round === gameData.round,
+    );
+    const previousCards = roundMoves.length ? roundMoves[0].cards : [];
 
-      // update game
-      const updatedGameData = helpers.updateGame(gameData, currentMove.length);
-      const updateGamePromise = admin
-        .firestore()
-        .doc(`games/${gameId}`)
-        .set(updatedGameData);
-
-      // remove cards from hand
-      const playerRef = await admin
-        .firestore()
-        .doc(`games/${gameId}/players/${uid}`)
-        .get();
-      const playerDoc = playerRef.data() as PlayerData;
-      const cardsToRemove = currentMove.reduce((prev, card) => {
-        prev.set(`${card.suit}_${card.value}`, true);
-        return prev;
-      }, new Map<string, boolean>());
-      const updatedCards = playerDoc.cards.filter((card) => {
-        return !cardsToRemove.has(`${card.suit}_${card.value}`);
-      });
-      playerDoc.cards = updatedCards;
-      const playerPromise = admin
-        .firestore()
-        .doc(`games/${gameId}/players/${uid}`)
-        .update(playerDoc);
-
-      // execute all promises
-      await Promise.all([movePromise, updateGamePromise, playerPromise]);
-      return true;
-    }
-
-    const previousMove = moves.empty ? [] : (moves.docs[0].data() as Card[]);
     functions.logger.info(`${funcName} ${gameId}: evaluating move`, {
       uid,
       gameId,
-      currentMove,
-      previousMove,
+      currentCards,
+      previousCards,
     });
 
-    // if no other moves, move must include 3 of spades
-    if (
-      moves.empty &&
-      (currentMove[0].suit !== 0 || currentMove[0].value !== 1)
-    ) {
-      functions.logger.info(
-        `${funcName} ${gameId}: first move must play 3 of spades`,
-        { uid, gameId, currentMove }
-      );
-      return false;
-    }
+    const error = helpers.isValidMove(currentCards, previousCards);
 
-    // if there are other moves, move must have same amount of cards
-    // except for bombs (exception)
-    if (!moves.empty && currentMove.length !== previousMove.length) {
-      functions.logger.info('playHand: wrong amount of cards', { uid, gameId });
-      return false;
-    }
-
-    // singles
-    if (currentMove.length === 1) {
-      functions.logger.info('playHand: playing singles', { uid, gameId });
-      if (!moves.empty) {
-        return isCardBetter(previousMove[0], currentMove[0]);
-      }
-      return true;
-    }
-
-    // doubles
-    if (currentMove.length === 2) {
-      const isDouble = currentMove[0].value === currentMove[1].value;
-      functions.logger.info('playHand: playing doubles', {
+    if (error) {
+      const message = `${funcName} ${gameId}: ${error}`;
+      functions.logger.info(message, {
         uid,
         gameId,
-        isDouble,
+        error,
+        currentCards,
+        previousCards,
       });
-
-      if (!moves.empty) {
-        return isDouble && isCardBetter(previousMove[1], currentMove[1]);
-      }
-      return isDouble;
+      throw new functions.https.HttpsError('invalid-argument', error);
     }
 
-    // triple or run
-    if (currentMove.length > 2) {
-      const a = currentMove[0].value;
-      const b = currentMove[1].value;
-      const c = currentMove[2].value;
-
-      const isTriple = a === b && b === c;
-      const isRun = a < b && b < c;
-      const isRunOrTriple = isTriple || isRun;
-
-      functions.logger.info('playHand: playing triple or run', {
-        uid,
-        gameId,
-        isTriple,
-        isRun,
+    // add move to stack
+    const movePromise = admin
+      .firestore()
+      .collection(`games/${gameId}/moves`)
+      .doc()
+      .set({
+        createdAt: admin.firestore.Timestamp.now(),
+        cards: currentCards,
+        round: gameData.round,
       });
 
-      if (!moves.empty) {
-        return isRunOrTriple && isCardBetter(previousMove[2], currentMove[2]);
-      }
-      return isRunOrTriple;
-    }
+    // update game
+    const updatedGameData = helpers.updateGame(gameData, currentCards.length);
+    const updateGamePromise = admin
+      .firestore()
+      .doc(`games/${gameId}`)
+      .set(updatedGameData);
 
-    // await admin.firestore()
-    // .doc(`/games/${gameId}`)
-    // .set({players, activePlayerId, status: 1}, {merge: true});
+    // remove cards from hand
+    const playerRef = await admin
+      .firestore()
+      .doc(`games/${gameId}/players/${uid}`)
+      .get();
+    const playerDoc = playerRef.data() as PlayerData;
+    const cardsToRemove = currentCards.reduce((prev, card) => {
+      prev.set(`${card.suit}_${card.value}`, true);
+      return prev;
+    }, new Map<string, boolean>());
+    const updatedCards = playerDoc.cards.filter((card) => {
+      return !cardsToRemove.has(`${card.suit}_${card.value}`);
+    });
+    playerDoc.cards = updatedCards;
+    const playerPromise = admin
+      .firestore()
+      .doc(`games/${gameId}/players/${uid}`)
+      .update(playerDoc);
+
+    // execute all promises
+    await Promise.all([movePromise, updateGamePromise, playerPromise]);
 
     return true;
   });

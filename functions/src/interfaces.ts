@@ -6,6 +6,11 @@ export enum GameStatus {
   completed,
 }
 
+export interface Move {
+  round?: number;
+  cards: Card[];
+}
+
 export interface Card {
   suit: number;
   value: number;

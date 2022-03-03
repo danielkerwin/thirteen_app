@@ -20,8 +20,12 @@ export const joinGameFunction = functions
     );
 
     if (playerIds.length >= 4) {
-      const message = `${funcName} ${gameId}: there is a maximum of 4 players playersplayersplayersplayersplayersplayersplayersplayersplayersplayersplayersplayersplayers`;
-      functions.logger.info(message, { uid, gameId, playerIds });
+      const message = `There is a maximum of 4 players`;
+      functions.logger.info(`${funcName} ${gameId}: ${message}`, {
+        uid,
+        gameId,
+        playerIds,
+      });
       throw new functions.https.HttpsError('permission-denied', message);
     }
 

@@ -5,13 +5,6 @@ import { cards } from './constants';
 import { shuffle } from 'lodash';
 import { Card } from './interfaces';
 
-const cardSorter = (a: Card, b: Card) => {
-  if (a.value == b.value) {
-    return a.suit - b.suit;
-  }
-  return a.value - b.value;
-};
-
 const funcName = 'startGame';
 
 export const startGameFunction = functions
@@ -35,7 +28,7 @@ export const startGameFunction = functions
 
     functions.logger.info(
       `${funcName} ${gameId}: there are ${playerIds.length} players`,
-      { uid, gameId, playerIds }
+      { uid, gameId, playerIds },
     );
 
     const playerCardsMap = playerIds.reduce((prev, id, idx) => {
@@ -88,14 +81,14 @@ export const startGameFunction = functions
     const players = gameData?.players;
     playerIds.forEach((userId, idx) => {
       const cards = playerCardsMap.get(idx) ?? [];
-      cards.sort(cardSorter);
+      cards.sort(helpers.cardSorter);
       players[userId].cardCount = cards.length;
       admin.firestore().doc(`games/${gameId}/players/${userId}`).set({ cards });
     });
 
     functions.logger.info(
       `${funcName} ${gameId}: setting game status to active`,
-      { uid, gameId }
+      { uid, gameId },
     );
 
     await admin

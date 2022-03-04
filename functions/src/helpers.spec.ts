@@ -108,7 +108,7 @@ describe('updateGame', () => {
     expect(updatedGame.activePlayerId).toBe(nextPlayerId);
   });
 
-  it('should skip a skipped player (4 players)', () => {
+  it('should skip a skipped player on skip (4 players)', () => {
     const players = {
       '1': new PlayerInfoMock(3, 'bill', 1),
       '2': new PlayerInfoMock(6, 'jim', 1),
@@ -130,7 +130,7 @@ describe('updateGame', () => {
     expect(updatedGame.activePlayerId).toBe(nextPlayerId);
   });
 
-  it('should skip a skipped player (4 players)', () => {
+  it('[1] should skip a skipped player on play (4 players)', () => {
     const players = {
       '1': new PlayerInfoMock(3, 'bill', 1),
       '2': new PlayerInfoMock(6, 'jim', 2),
@@ -149,6 +149,28 @@ describe('updateGame', () => {
     const updatedGame = helpers.updateGame(game, 2);
     expect(updatedGame.players[currentPlayerId].round).toBe(1);
     expect(updatedGame.round).toBe(1);
+    expect(updatedGame.activePlayerId).toBe(nextPlayerId);
+  });
+
+  it('[2] should skip a skipped player on play (4 players)', () => {
+    const players = {
+      '1': new PlayerInfoMock(2, 'bill', 2),
+      '2': new PlayerInfoMock(0, 'jim', 2),
+      '3': new PlayerInfoMock(1, 'steve', 2),
+      '4': new PlayerInfoMock(1, 'jack', 2),
+    };
+    const currentPlayerId = '3';
+    const nextPlayerId = '4';
+    const playerIds = ['1', '2', '3', '4'];
+    const game = new GameDataMock({
+      players,
+      playerIds,
+      activePlayerId: currentPlayerId,
+      round: 5,
+    });
+    const updatedGame = helpers.updateGame(game, 1);
+    expect(updatedGame.players[currentPlayerId].round).toBe(6);
+    expect(updatedGame.round).toBe(5);
     expect(updatedGame.activePlayerId).toBe(nextPlayerId);
   });
 

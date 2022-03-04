@@ -49,10 +49,6 @@ export const updateGame = (
   cardsPlayed: number,
   isSkipping = false,
 ): GameData => {
-  // update card count
-  const player = game.players[game.activePlayerId];
-  player.cardCount -= cardsPlayed;
-
   // find next player first
   const playersInRound = game.playerIds.filter((id) => {
     const player = game.players[id];
@@ -60,6 +56,10 @@ export const updateGame = (
   });
   const nextPlayerId = getNextPlayerId(game, playersInRound);
   let playersCount = playersInRound.length;
+
+  // update card count
+  const player = game.players[game.activePlayerId];
+  player.cardCount -= cardsPlayed;
 
   // add user to game ranking if they're finished
   if (player.cardCount === 0) {

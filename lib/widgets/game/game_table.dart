@@ -97,25 +97,38 @@ class GameTable extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Round ${game.round}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: game.isActivePlayer
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.secondary,
+                  if (!game.isActive)
+                    Text(
+                      'Waiting for ${game.createdByName} to start the game',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: theme.colorScheme.secondary,
+                      ),
+                    )
+                  else ...[
+                    Text(
+                      'Round ${game.round}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: game.isActivePlayer
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.secondary,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '${game.activePlayerName} starts',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: game.isActivePlayer
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.secondary,
-                    ),
-                  )
+                    Text(
+                      '${game.activePlayerName} starts',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: game.isActivePlayer
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.secondary,
+                      ),
+                    )
+                  ]
                 ],
               ),
             ..._buildCardsOnTable(

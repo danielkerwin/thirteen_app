@@ -14,8 +14,9 @@ class Game {
   final List<String> playerIds;
   final GameStatus status;
   final Map<String, PlayerInfo> players;
-  final int round;
   final List<String> rankIds;
+  final int round;
+  final int turn;
 
   Game({
     required this.status,
@@ -26,8 +27,9 @@ class Game {
     required this.activePlayerId,
     required this.playerIds,
     required this.players,
-    required this.round,
     required this.rankIds,
+    required this.round,
+    required this.turn,
   });
 
   bool get isCreatedByMe {
@@ -98,8 +100,9 @@ class Game {
       playerIds: [],
       players: {},
       status: GameStatus.created,
-      round: 1,
       rankIds: [],
+      round: 1,
+      turn: 1,
     );
   }
 
@@ -128,8 +131,9 @@ class Game {
         );
       }),
       status: status,
-      round: gameData['round'] ?? 1,
       rankIds: rankIds.map((id) => id.toString()).toList(),
+      round: gameData['round'] ?? 1,
+      turn: gameData['turn'] ?? 1,
     );
   }
 }

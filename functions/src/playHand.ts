@@ -50,7 +50,7 @@ export const playHandFunction = functions
       previousCards,
     });
 
-    const error = helpers.isValidMove(currentCards, previousCards);
+    const error = helpers.isValidMove(gameData, currentCards, previousCards);
 
     if (error) {
       const message = `${funcName} ${gameId}: ${error}`;

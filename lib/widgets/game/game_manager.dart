@@ -93,6 +93,8 @@ class _GameManagerState extends State<GameManager> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        if (game.isJoined && !game.isActive && !game.isCreatedByMe)
+          Text('Waiting for ${game.createdByName} to start the game'),
         if (!game.isJoined && game.isCreated)
           ElevatedButton(
             child: _isLoading

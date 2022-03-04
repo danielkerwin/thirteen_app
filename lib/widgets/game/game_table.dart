@@ -80,17 +80,10 @@ class GameTable extends StatelessWidget {
       height: mediaQuery.size.height / 2 * 0.5,
       constraints: const BoxConstraints(maxWidth: 500),
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondary.withOpacity(0.1),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            theme.colorScheme.secondary.withOpacity(0.2),
-            theme.colorScheme.secondary.withOpacity(0)
-          ],
-        ),
         border: Border.all(
-          color: theme.colorScheme.secondary,
+          color: game.isActivePlayer
+              ? theme.colorScheme.primary
+              : theme.colorScheme.secondary,
           width: 0.7,
         ),
         borderRadius: const BorderRadius.all(Radius.circular(20)),
@@ -100,6 +93,31 @@ class GameTable extends StatelessWidget {
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
+            if (latestCards.isEmpty)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Round ${game.round}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: game.isActivePlayer
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.secondary,
+                    ),
+                  ),
+                  Text(
+                    '${game.activePlayerName} starts',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: game.isActivePlayer
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.secondary,
+                    ),
+                  )
+                ],
+              ),
             ..._buildCardsOnTable(
               previousCards,
               contraints,

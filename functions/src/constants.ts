@@ -24,4 +24,5 @@ export const moveErrors = {
   notSameValue: 'Your cards must be same value',
   runNotBetter: 'Your run is not better',
   notRunNotSame: 'Your cards are neither same value nor in sequence',
+  firstHand: 'First hand must include the lowest card',
 };

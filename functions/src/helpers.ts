@@ -1,6 +1,7 @@
 import { Card, GameData, GameStatus } from './interfaces';
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import { moveErrors } from './constants';
 
 export const getGameData = async (
   funcName: string,
@@ -35,11 +36,8 @@ export const getNextPlayerId = (
   game: GameData,
   playersInRound: string[],
 ): string => {
-  const activeIndex = game.playerIds.indexOf(game.activePlayerId);
-  const nextIndex =
-    playersInRound.length < game.playerIds.length
-      ? activeIndex
-      : activeIndex + 1;
+  const activeIndex = playersInRound.indexOf(game.activePlayerId);
+  const nextIndex = activeIndex + 1;
   if (nextIndex > playersInRound.length - 1) {
     return playersInRound[0];
   }
@@ -55,14 +53,25 @@ export const updateGame = (
   const player = game.players[game.activePlayerId];
   player.cardCount -= cardsPlayed;
 
+  // find next player first
+  const playersInRound = game.playerIds.filter((id) => {
+    const player = game.players[id];
+    return player.round <= game.round && player.cardCount > 0;
+  });
+  const nextPlayerId = getNextPlayerId(game, playersInRound);
+  let playersCount = playersInRound.length;
+
   // add user to game ranking if they're finished
   if (player.cardCount === 0) {
     game.rankIds.push(game.activePlayerId);
+    player.round = game.round + 1;
+    playersCount -= 1;
   }
 
   // skip round if applicable
   if (isSkipping && player.round <= game.round) {
     player.round = game.round + 1;
+    playersCount -= 1;
   }
 
   // check if game is over
@@ -70,21 +79,18 @@ export const updateGame = (
     game.status = GameStatus.completed;
   }
 
+  // increment turn
+  game.turn += 1;
+
   // check if round is over and activate next player
   if (game.status !== GameStatus.completed) {
-    // check for active players
-    const playersInRound = game.playerIds.filter((id) => {
-      const player = game.players[id];
-      return player.round <= game.round && player.cardCount > 0;
-    });
-
     // increment next round
-    if (playersInRound.length === 1) {
+    if (playersCount === 1) {
       game.round += 1;
     }
 
     // activate next player
-    game.activePlayerId = getNextPlayerId(game, playersInRound);
+    game.activePlayerId = nextPlayerId;
   }
   return game;
 };
@@ -139,32 +145,43 @@ export const getSameValueType = (length: number): string => {
 };
 
 export const isValidMove = (
+  game: GameData,
   current: Card[],
   previous: Card[] = [],
 ): string | null => {
   const cards = current.sort(cardSorter);
   const prev = previous.sort(cardSorter);
 
+  if (game.round === 1 && !prev.length) {
+    const hasLowestCard = cards.some((card) => {
+      const key = `${card.value}_${card.suit}`;
+      return game.lowestCardId === key;
+    });
+    if (!hasLowestCard) {
+      return moveErrors.firstHand;
+    }
+  }
+
   if (prev.length && prev.length !== cards.length) {
-    return `Wrong amount of cards (expected ${prev.length})`;
+    return moveErrors.wrongAmount(prev.length);
   }
 
   if (isSameValue(cards)) {
     if (prev.length && isSequence(prev)) {
-      return 'Your cards must be in a run';
+      return moveErrors.notRun;
     }
     if (prev.length && !isLastCardBetter(cards, prev)) {
-      return getSameValueType(cards.length);
+      return moveErrors.sameValueNotBetter(cards.length);
     }
   } else if (isSequence(cards)) {
     if (prev.length && isSameValue(prev)) {
-      return 'Your cards must be same value';
+      return moveErrors.notSameValue;
     }
     if (prev.length && !isLastCardBetter(cards, prev)) {
-      return 'Your run is not better';
+      return moveErrors.runNotBetter;
     }
   } else {
-    return 'Your cards are neither same value nor in sequence';
+    return moveErrors.notRunNotSame;
   }
 
   return null;

@@ -20,6 +20,15 @@ export const skipRoundFunction = functions
       throw new functions.https.HttpsError('invalid-argument', message);
     }
 
+    if (gameData.round === 1 && gameData.turn === 1) {
+      const message = 'Cannot skip the first hand';
+      functions.logger.info(`${funcName} ${gameId}: ${message}`, {
+        uid,
+        gameId,
+      });
+      throw new functions.https.HttpsError('invalid-argument', message);
+    }
+
     if (gameData.players[uid].round > gameData.round) {
       const message = 'Already skipped this round';
       functions.logger.info(`${funcName} ${gameId}: ${message}`, {

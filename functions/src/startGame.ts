@@ -47,8 +47,9 @@ export const startGameFunction = functions
     }
 
     let playerIndex = 0;
-    let lowestCard: Card;
+    let lowestCard: Card | null = null;
     let activePlayerId: string | null = null;
+    let lowestCardId: string | null = null;
 
     shuffledCards.forEach((card) => {
       const player = playerCardsMap.get(playerIndex);
@@ -56,6 +57,7 @@ export const startGameFunction = functions
       if (!lowestCard) {
         lowestCard = card;
         activePlayerId = playerIds[playerIndex];
+        lowestCardId = `${card.value}_${card.suit}`;
       }
 
       if (
@@ -64,6 +66,7 @@ export const startGameFunction = functions
       ) {
         lowestCard = card;
         activePlayerId = playerIds[playerIndex];
+        lowestCardId = `${card.value}_${card.suit}`;
       }
 
       if (card.suit === 0 && card.value === 1) {
@@ -94,7 +97,10 @@ export const startGameFunction = functions
     await admin
       .firestore()
       .doc(`/games/${gameId}`)
-      .set({ players, activePlayerId, status: 1 }, { merge: true });
+      .set(
+        { players, activePlayerId, lowestCardId, status: 1 },
+        { merge: true },
+      );
 
     return true;
   });

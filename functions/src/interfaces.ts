@@ -41,4 +41,6 @@ export interface GameData {
   rules: Record<string, unknown>;
   status: GameStatus;
   round: number;
+  lowestCardId: string;
+  turn: number;
 }

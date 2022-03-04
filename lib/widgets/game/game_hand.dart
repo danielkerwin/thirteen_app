@@ -190,7 +190,8 @@ class _GameHandState extends State<GameHand> {
     return game.isActivePlayer &&
         !game.isSkippedRound &&
         !_isLoading &&
-        game.isActive;
+        game.isActive &&
+        game.turn != 1;
   }
 
   bool _canPlay(Game game) {

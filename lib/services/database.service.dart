@@ -60,8 +60,9 @@ class DatabaseService {
         },
       },
       'rules': {},
-      'round': 1,
       'rankIds': [],
+      'round': 1,
+      'turn': 1,
     });
   }
 

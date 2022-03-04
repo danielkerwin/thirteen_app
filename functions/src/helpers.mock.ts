@@ -23,6 +23,8 @@ export class GameDataMock implements GameData {
   round = 1;
   rules: Record<string, unknown> = {};
   status: GameStatus = GameStatus.active;
+  lowestCardId = '1_0';
+  turn = 0;
 
   constructor(options?: Partial<GameData>) {
     this.activePlayerId = options?.activePlayerId ?? this.activePlayerId;
@@ -34,6 +36,7 @@ export class GameDataMock implements GameData {
     this.round = options?.round ?? this.round;
     this.rules = options?.rules ?? this.rules;
     this.status = options?.status ?? this.status;
+    this.lowestCardId = options?.lowestCardId ?? this.lowestCardId;
   }
 }
 

@@ -69,9 +69,10 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
               children: [
                 SwitchListTile.adaptive(
                   value: _enableBombs,
-                  onChanged: (val) => setState(
-                    () => _enableBombs = !_enableBombs,
-                  ),
+                  onChanged: null,
+                  // onChanged: (val) => setState(
+                  //   () => _enableBombs = !_enableBombs,
+                  // ),
                   title: const Text('Enable bombs'),
                 ),
                 if (_enableBombs)
@@ -85,7 +86,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         value: true,
                         activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (val) {},
+                        onChanged: null,
                         title: const Text('Bomb on 2\'s'),
                         subtitle: const Text(
                           'A valid bomb can only be played on 2\'s',
@@ -97,7 +98,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         value: true,
                         activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (val) {},
+                        onChanged: null,
                         title: const Text('Triple doubles (sequential)'),
                         subtitle: const Text('eg. 3,3,4,4,5,5'),
                       ),
@@ -107,7 +108,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         value: true,
                         activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (val) {},
+                        onChanged: null,
                         title: const Text('Four of a kind'),
                         subtitle: const Text('eg. 7,7,7,7'),
                       ),
@@ -117,7 +118,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         value: true,
                         activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (val) {},
+                        onChanged: null,
                         title: const Text('Pair & triple (sequential)'),
                         subtitle: const Text('eg. 4,4,5,5,5'),
                       ),
@@ -126,9 +127,10 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                 if (_enableBombs) const Divider(),
                 SwitchListTile.adaptive(
                   value: _enableInstantWins,
-                  onChanged: (val) => setState(
-                    () => _enableInstantWins = !_enableInstantWins,
-                  ),
+                  onChanged: null,
+                  // onChanged: (val) => setState(
+                  //   () => _enableInstantWins = !_enableInstantWins,
+                  // ),
                   title: const Text('Enable instant wins'),
                 ),
                 if (_enableInstantWins)
@@ -142,7 +144,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         value: true,
                         activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (val) {},
+                        onChanged: null,
                         title: const Text('Four 2\'s'),
                         subtitle: const Text('eg. 2,2,2,2'),
                       ),
@@ -152,7 +154,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         value: true,
                         activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (val) {},
+                        onChanged: null,
                         title: const Text('Six pairs'),
                         subtitle: const Text('eg. 3,3,5,5,8,8,9,9,J,J,10,10'),
                       ),
@@ -162,7 +164,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                         ),
                         value: true,
                         activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (val) {},
+                        onChanged: null,
                         title: const Text('Dragon'),
                         subtitle:
                             const Text('eg. 3 to A: 3,4,5,6,7,8,9,10,J,Q,K,A'),
@@ -172,8 +174,9 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                 if (_enableInstantWins) const Divider(),
                 SwitchListTile.adaptive(
                   value: _enableTimeLimit,
-                  onChanged: (val) =>
-                      setState(() => _enableTimeLimit = !_enableTimeLimit),
+                  onChanged: null,
+                  // onChanged: (val) =>
+                  //     setState(() => _enableTimeLimit = !_enableTimeLimit),
                   title: const Text('Enable time limits'),
                 ),
               ],

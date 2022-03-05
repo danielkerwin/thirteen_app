@@ -86,8 +86,6 @@ class _GameManagerState extends ConsumerState<GameManager> {
 
   @override
   Widget build(BuildContext context) {
-    print('building game_manager');
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(

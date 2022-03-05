@@ -194,7 +194,6 @@ class _GameHandState extends ConsumerState<GameHand> {
 
   @override
   Widget build(BuildContext context) {
-    print('Building game_hand');
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     final gameHandAsync = ref.watch(gameHandProvider(widget.game.id));

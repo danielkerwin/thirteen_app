@@ -19,7 +19,6 @@ class GameScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('building game_screen');
     final theme = Theme.of(context);
     final gameAsync = ref.watch(gameProvider(gameId));
 

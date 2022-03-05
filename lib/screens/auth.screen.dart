@@ -45,7 +45,6 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } on FirebaseAuthException catch (err) {
       print('FirebaseAuthException ${err.message}');
-      print('FirebaseAuthException ${err.toString()}');
       scaffold.hideCurrentSnackBar();
       scaffold.showSnackBar(
         SnackBar(

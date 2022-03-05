@@ -68,7 +68,6 @@ class GameTable extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
-    print('building game_table');
 
     final movesAsync = ref.watch(gameMovesProvider(game.id));
 

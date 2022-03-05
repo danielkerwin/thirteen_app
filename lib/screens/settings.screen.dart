@@ -12,7 +12,6 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('build settings_screen');
     final userDataAsync = ref.watch(userDataProvider);
     return userDataAsync.when(
       error: (err, stack) => const Center(child: Text('Error')),

@@ -36,7 +36,6 @@ class GamePlayers extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print('building game_players');
     return Column(
       children: [
         Row(

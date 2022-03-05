@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
-import '../providers/providers.dart';
+import '../providers/database.provider.dart';
+import '../providers/game.provider.dart';
 import 'game.screen.dart';
 import '../widgets/main/loading.dart';
 

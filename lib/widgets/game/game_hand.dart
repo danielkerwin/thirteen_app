@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/audio.constant.dart';
 import '../../helpers/helpers.dart';
-import '../../providers/providers.dart';
+import '../../providers/audio.provider.dart';
+import '../../providers/database.provider.dart';
 import '../../models/game.model.dart';
 import '../../models/game_card.model.dart';
+import '../../providers/game_hand.provider.dart';
 import '../main/loading.dart';
 import 'game_card_item.dart';
 
@@ -195,7 +197,7 @@ class _GameHandState extends ConsumerState<GameHand> {
     print('Building game_hand');
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
-    final gameHandAsync = ref.watch(playerHandProvider(widget.game.id));
+    final gameHandAsync = ref.watch(gameHandProvider(widget.game.id));
     return gameHandAsync.when(
       error: (err, stack) => const Center(
         child: Text('Error'),

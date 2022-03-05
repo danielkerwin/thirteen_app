@@ -84,8 +84,8 @@ class _AuthFormState extends State<AuthForm> {
                         if (val == null || val.isEmpty) {
                           return 'Nickname is required';
                         }
-                        if (val.length < 3 || val.length > 10) {
-                          return 'Nickname must be between 3 to 10 characters';
+                        if (val.length < 3 || val.length > 15) {
+                          return 'Nickname must be between 3 to 15 characters';
                         }
                         return null;
                       },

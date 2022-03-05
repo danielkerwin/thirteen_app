@@ -73,6 +73,7 @@ export const playHandFunction = functions
         createdAt: admin.firestore.Timestamp.now(),
         cards: currentCards,
         round: gameData.round,
+        userId: uid,
       });
 
     // update game

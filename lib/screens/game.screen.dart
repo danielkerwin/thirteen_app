@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/providers.dart';
+import '../providers/game.provider.dart';
 import '../widgets/game/game_hand.dart';
 import '../widgets/game/game_manager.dart';
 import '../widgets/game/game_players.dart';
 import '../widgets/game/game_table.dart';
+import '../widgets/game/game_moves.dart';
 import '../widgets/main/loading.dart';
 
 class GameScreen extends ConsumerWidget {
@@ -65,6 +66,7 @@ class GameScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [GameTable(game: game)],
               ),
+              GameMoves(game: game),
               GameManager(game: game),
               Expanded(
                 child: GameHand(

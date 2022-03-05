@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/game.model.dart';
 import '../models/game_card.model.dart';
-import '../models/moves.model.dart';
-import '../models/player.model.dart';
+import '../models/game_moves.model.dart';
+import '../models/game_hand.model.dart';
 import '../models/user_data.model.dart';
 
 typedef DocSnapshot = DocumentSnapshot<Map<String, dynamic>>;
@@ -133,16 +133,16 @@ class DatabaseService {
         .map((snapshot) => Game.fromFirestore(snapshot, userId));
   }
 
-  Stream<PlayerHand> getPlayerHandStream(String gameId) {
+  Stream<GameHand> getGameHandStream(String gameId) {
     return FirebaseFirestore.instance
         .doc('games/$gameId/players/$userId')
         .snapshots()
         .map(
-          (snapshot) => PlayerHand.fromFirestore(snapshot),
+          (snapshot) => GameHand.fromFirestore(snapshot),
         );
   }
 
-  Stream<List<GameMoves>> getMovesStream(String gameId) {
+  Stream<List<GameMoves>> getGameMovesStream(String gameId) {
     return FirebaseFirestore.instance
         .collection('games/$gameId/moves')
         .orderBy('createdAt', descending: true)

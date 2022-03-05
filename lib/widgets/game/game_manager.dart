@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/audio.constant.dart';
 import '../../helpers/helpers.dart';
-import '../../providers/providers.dart';
 import '../../models/game.model.dart';
+import '../../providers/audio.provider.dart';
+import '../../providers/database.provider.dart';
 
 class GameManager extends ConsumerStatefulWidget {
   final Game game;

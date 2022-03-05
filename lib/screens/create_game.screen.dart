@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nanoid/async.dart';
 
 import '../constants/nanoid.constant.dart';
-import '../providers/providers.dart';
+import '../providers/database.provider.dart';
 import 'game.screen.dart';
 
 class CreateGameScreen extends ConsumerStatefulWidget {

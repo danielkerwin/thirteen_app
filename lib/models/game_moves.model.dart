@@ -1,31 +1,24 @@
 import '../services/database.service.dart';
 import 'game_card.model.dart';
 
-class PlayerInfo {
-  final int cardCount;
-  final int round;
-  final String nickname;
-
-  const PlayerInfo({
-    required this.cardCount,
-    required this.round,
-    required this.nickname,
-  });
-}
-
-class PlayerHand {
+class GameMoves {
   final List<GameCard> cards;
+  final String userId;
+  final int round;
 
-  const PlayerHand({required this.cards});
+  const GameMoves({
+    required this.cards,
+    required this.userId,
+    required this.round,
+  });
 
-  factory PlayerHand.fromEmpty() {
-    return const PlayerHand(cards: []);
-  }
-
-  factory PlayerHand.fromFirestore(DocSnapshot doc) {
+  factory GameMoves.fromFirestore(DocSnapshot doc) {
     Map<String, dynamic> data = doc.data() ?? {};
     List<dynamic> cards = data['cards'] ?? [];
-    return PlayerHand(
+
+    return GameMoves(
+      round: data['round'] ?? 0,
+      userId: data['userId'] ?? '',
       cards: cards
           .map(
             (card) => GameCard(

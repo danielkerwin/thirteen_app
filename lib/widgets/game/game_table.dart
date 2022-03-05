@@ -3,10 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../providers/providers.dart';
 import '../../models/game.model.dart';
 import '../../models/game_card.model.dart';
-import '../../models/moves.model.dart';
+import '../../models/game_moves.model.dart';
+import '../../providers/game_moves.provider.dart';
 import '../main/loading.dart';
 import 'game_card_item.dart';
 

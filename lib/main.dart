@@ -7,7 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
+import 'providers/auth.provider.dart';
 import 'providers/providers.dart';
+import 'providers/shared_pref.provider.dart';
+import 'providers/user_data.provider.dart';
 import 'screens/auth.screen.dart';
 import 'screens/create_game.screen.dart';
 import 'screens/game.screen.dart';

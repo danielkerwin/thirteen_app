@@ -1,9 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../services/database.service.dart';
-import 'player.model.dart';
 
 enum GameStatus { created, active, complete }
+
+class PlayerInfo {
+  final int cardCount;
+  final int round;
+  final String nickname;
+
+  const PlayerInfo({
+    required this.cardCount,
+    required this.round,
+    required this.nickname,
+  });
+}
 
 class Game {
   final String id;
@@ -96,23 +107,6 @@ class Game {
       default:
         return GameStatus.created;
     }
-  }
-
-  factory Game.fromEmpty() {
-    return Game(
-      id: '',
-      activePlayerId: '',
-      createdAt: DateTime.now(),
-      createdById: '',
-      createdByName: '',
-      playerIds: [],
-      players: {},
-      status: GameStatus.created,
-      rankIds: [],
-      round: 1,
-      turn: 1,
-      userId: '',
-    );
   }
 
   factory Game.fromFirestore(DocSnapshot doc, String userId) {

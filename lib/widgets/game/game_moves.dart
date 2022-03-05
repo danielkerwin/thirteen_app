@@ -62,21 +62,34 @@ class GameMoves extends ConsumerWidget {
         final desc =
             GameMoveType.values[moveType.index].description(cards.length);
 
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('$player played a'),
-            const SizedBox(width: 3),
-            Text(
-              desc,
-              style: TextStyle(
-                color: theme.colorScheme.secondary,
-                fontWeight: FontWeight.bold,
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10.0),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FittedBox(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('$player played a'),
+                  const SizedBox(width: 3),
+                  Text(
+                    desc,
+                    style: TextStyle(
+                      color: theme.colorScheme.secondary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 3),
+                  Helpers.highCard(lastCard),
+                ],
               ),
             ),
-            const SizedBox(width: 3),
-            Helpers.highCard(lastCard),
-          ],
+          ),
         );
       },
     );

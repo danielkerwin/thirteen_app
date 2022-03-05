@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nanoid/async.dart';
 
-import '../constants/nanoid.constant.dart';
+import '../constants/nanoid.constants.dart';
 import '../providers/database.provider.dart';
 import 'game.screen.dart';
 

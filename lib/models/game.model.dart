@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../constants/game.constants.dart';
 import '../services/database.service.dart';
-
-enum GameStatus { created, active, complete }
 
 class PlayerInfo {
   final int cardCount;

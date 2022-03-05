@@ -2,7 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../constants/audio.constant.dart';
+import '../../constants/audio.constants.dart';
 import '../../helpers/helpers.dart';
 import '../../providers/audio.provider.dart';
 import '../../providers/database.provider.dart';

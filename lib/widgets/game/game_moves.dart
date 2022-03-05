@@ -64,7 +64,7 @@ class GameMoves extends ConsumerWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withOpacity(0.2),
             borderRadius: const BorderRadius.all(
               Radius.circular(10.0),
             ),
@@ -85,7 +85,10 @@ class GameMoves extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 3),
-                  Helpers.highCard(lastCard),
+                  Helpers.highCard(
+                    lastCard,
+                    theme.textTheme.bodyText1!.color!,
+                  ),
                 ],
               ),
             ),

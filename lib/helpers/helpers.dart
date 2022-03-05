@@ -31,15 +31,15 @@ class Helpers {
     });
   }
 
-  static Widget highCard(GameCard card) {
+  static Widget highCard(GameCard card, Color color) {
     return Row(
       children: [
         Text('(${card.label}'),
         const SizedBox(width: 2),
         Icon(
           GameCardSuit.values[card.suit.index].icon,
-          size: 11,
-          color: Colors.white,
+          size: 12,
+          color: color,
         ),
         const SizedBox(width: 4),
         const Text('high)'),

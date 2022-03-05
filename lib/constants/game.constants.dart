@@ -32,13 +32,13 @@ extension GameCardSuitExtension on GameCardSuit {
   IconData get icon {
     switch (this) {
       case GameCardSuit.spade:
-        return FontAwesomeIcons.lightSpade;
+        return FontAwesomeIcons.spade;
       case GameCardSuit.club:
-        return FontAwesomeIcons.lightClub;
+        return FontAwesomeIcons.club;
       case GameCardSuit.diamond:
-        return FontAwesomeIcons.lightDiamond;
+        return FontAwesomeIcons.diamond;
       case GameCardSuit.heart:
-        return FontAwesomeIcons.lightHeart;
+        return FontAwesomeIcons.heart;
     }
   }
 

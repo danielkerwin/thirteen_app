@@ -63,9 +63,11 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
                     child: const Text('Create game'),
                   ),
                 ),
-              )
+              ),
             ],
           ),
+          const Divider(),
+          const Text('Advanced Settings are currently disabled'),
           Expanded(
             child: ListView(
               children: [

@@ -74,6 +74,17 @@ class Game {
     return players[activePlayerId]?.nickname ?? 'someone';
   }
 
+  String get gameStatus {
+    switch (status) {
+      case GameStatus.created:
+        return 'NEW';
+      case GameStatus.active:
+        return 'ACTIVE';
+      case GameStatus.complete:
+        return 'COMPLETE';
+    }
+  }
+
   static GameStatus _getStatus(int status) {
     switch (status) {
       case 0:

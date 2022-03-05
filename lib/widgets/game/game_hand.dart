@@ -197,70 +197,70 @@ class _GameHandState extends ConsumerState<GameHand> {
     final theme = Theme.of(context);
     final gameHandAsync = ref.watch(playerHandProvider(widget.game.id));
     return gameHandAsync.when(
-        error: (err, stack) => const Center(
-              child: Text('Error'),
-            ),
-        loading: () => const Loading(),
-        data: (gameHand) => Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+      error: (err, stack) => const Center(
+        child: Text('Error'),
+      ),
+      loading: () => const Loading(),
+      data: (gameHand) => Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Expanded(
+                Opacity(
+                  opacity: _isLoading ? 0.8 : 1.0,
                   child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Opacity(
-                        opacity: _isLoading ? 0.8 : 1.0,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: _buildCardsLayout(
-                            gameHand.cards,
-                            context,
-                            mediaQuery,
-                          ),
-                        ),
-                      ),
-                      if (_isLoading)
-                        CircularProgressIndicator.adaptive(
-                          backgroundColor: theme.primaryColor,
-                        )
-                    ],
+                    clipBehavior: Clip.none,
+                    children: _buildCardsLayout(
+                      gameHand.cards,
+                      context,
+                      mediaQuery,
+                    ),
                   ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton(
-                      onPressed: _canSkip() ? () => _skipRound() : null,
-                      child: const Text('Skip'),
-                      style: ElevatedButton.styleFrom(
-                        primary: theme.colorScheme.secondary,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed:
-                              _canPlay() ? () => _playSelectedCards() : null,
-                          child: Text('Play ${_selectedCards.length} selected'),
-                          style: ElevatedButton.styleFrom(
-                              // primary: theme.primaryColor,
-                              ),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: _selectedCards.isEmpty || _isLoading
-                          ? null
-                          : _unselectCards,
-                      child: const Text('Unselect'),
-                      style: ElevatedButton.styleFrom(
-                        primary: theme.colorScheme.secondary,
-                      ),
-                    ),
-                  ],
-                )
+                if (_isLoading)
+                  CircularProgressIndicator.adaptive(
+                    backgroundColor: theme.primaryColor,
+                  )
               ],
-            ));
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: _canSkip() ? () => _skipRound() : null,
+                child: const Text('Skip'),
+                style: ElevatedButton.styleFrom(
+                  primary: theme.colorScheme.secondary,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _canPlay() ? () => _playSelectedCards() : null,
+                    child: Text('Play ${_selectedCards.length} selected'),
+                    style: ElevatedButton.styleFrom(
+                        // primary: theme.primaryColor,
+                        ),
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: _selectedCards.isEmpty || _isLoading
+                    ? null
+                    : _unselectCards,
+                child: const Text('Unselect'),
+                style: ElevatedButton.styleFrom(
+                  primary: theme.colorScheme.secondary,
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 }

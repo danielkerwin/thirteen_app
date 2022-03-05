@@ -6,7 +6,6 @@ import '../../constants/audio.constant.dart';
 import '../../helpers/helpers.dart';
 import '../../providers/providers.dart';
 import '../../models/game.model.dart';
-import '../../services/database.service.dart';
 
 class GameManager extends ConsumerStatefulWidget {
   final Game game;

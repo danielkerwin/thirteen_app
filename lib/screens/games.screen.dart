@@ -1,25 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 import '../providers/providers.dart';
-import '../models/game.model.dart';
 import 'game.screen.dart';
 import '../widgets/main/loading.dart';
 
 class GamesScreen extends ConsumerWidget {
   const GamesScreen({Key? key}) : super(key: key);
-
-  String _getGameStatus(GameStatus status) {
-    switch (status) {
-      case GameStatus.created:
-        return 'NEW';
-      case GameStatus.active:
-        return 'ACTIVE';
-      case GameStatus.complete:
-        return 'COMPLETE';
-    }
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,9 +51,18 @@ class GamesScreen extends ConsumerWidget {
                 ),
               ),
               child: ListTile(
-                title: Text('Game #${game.id}'),
+                title: Text(
+                  'Game #${game.id}',
+                  style: TextStyle(
+                    color: game.isComplete ? theme.disabledColor : null,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 subtitle: Text(
-                  '${DateFormat.yMMMd().format(game.createdAt)} - ${_getGameStatus(game.status)}',
+                  '${DateFormat.yMMMd().format(game.createdAt)} - ${game.gameStatus}',
+                  style: TextStyle(
+                    color: game.isComplete ? theme.disabledColor : null,
+                  ),
                 ),
                 trailing: game.isActive
                     ? Text(
@@ -76,7 +74,13 @@ class GamesScreen extends ConsumerWidget {
                               : theme.colorScheme.secondary,
                         ),
                       )
-                    : null,
+                    : game.isComplete && game.isWinner
+                        ? Icon(
+                            FontAwesomeIcons.solidTrophyAlt,
+                            color: theme.disabledColor,
+                            size: 25,
+                          )
+                        : null,
                 onTap: () {
                   Navigator.of(context).pushNamed(
                     '${GameScreen.routeName}?id=${game.id}',

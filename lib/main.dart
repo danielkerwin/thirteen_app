@@ -1,22 +1,20 @@
-import 'package:audioplayers/audioplayers.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
-import 'helpers/helpers.dart';
-import 'models/user_data.model.dart';
-
+import 'providers/providers.dart';
 import 'screens/auth.screen.dart';
 import 'screens/create_game.screen.dart';
 import 'screens/game.screen.dart';
 import 'screens/tabs.screen.dart';
-import 'services/database.service.dart';
 import 'themes/dark.theme.dart';
 import 'themes/light.theme.dart';
+import 'widgets/main/loading.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,15 +24,19 @@ void main() async {
   // FirebaseFunctions.instanceFor(region: 'australia-southeast1')
   //     .useFunctionsEmulator('localhost', 5001);
   // FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  runApp(MyApp(prefs: prefs));
+  SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
+  runApp(
+    ProviderScope(
+      observers: [if (kDebugMode) Logger()],
+      overrides: [sharedPrefsProvider.overrideWithValue(sharedPrefs)],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  final SharedPreferences prefs;
+class MyApp extends ConsumerWidget {
   const MyApp({
     Key? key,
-    required this.prefs,
   }) : super(key: key);
 
   // final _router = GoRouter(
@@ -51,72 +53,46 @@ class MyApp extends StatelessWidget {
   // );
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, authSnapshot) {
-        final isDarkMode = prefs.getBool('isDarkMode') ?? false;
-        return MultiProvider(
-          providers: [
-            StreamProvider<UserData>.value(
-              initialData: UserData.fromEmpty(isDarkMode),
-              value: DatabaseService.getUserStream(
-                authSnapshot.data?.uid,
-                isDarkMode,
-              ),
-            ),
-            Provider<AudioCache>(
-              create: (_) => AudioCache(
-                prefix: 'assets/audio/',
-                respectSilence: true,
-              ),
-            )
-          ],
-          child: Consumer<UserData>(
-            builder: (_, userData, __) {
-              if (authSnapshot.hasData && userData.uid.isEmpty) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? darkTheme.backgroundColor
-                        : lightTheme.backgroundColor,
-                  ),
-                  child: const Center(child: CircularProgressIndicator()),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authStateAsync = ref.watch(authStateChangesProvider);
+    final userDarkMode = ref.watch(
+      userDataProvider.select((userData) => userData.value?.isDarkMode),
+    );
+    final prefsDarkMode = ref.read(sharedPrefsProvider).getBool('isDarkMode');
+    final isDarkMode = userDarkMode ?? prefsDarkMode ?? false;
+
+    return authStateAsync.when(
+      data: (auth) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Thirteen',
+          theme: isDarkMode ? darkTheme : lightTheme,
+          home: auth == null ? const AuthScreen() : const TabsScreen(),
+          routes: {
+            CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
+          },
+          onGenerateRoute: (settings) {
+            final uri = Uri.parse(settings.name!);
+
+            switch (uri.path) {
+              case GameScreen.routeName:
+                final gameId = uri.queryParameters['id']!;
+                return MaterialPageRoute(
+                  builder: (ctx) {
+                    return GameScreen(gameId: gameId);
+                  },
+                  settings: settings,
                 );
-              }
-
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                title: 'Thirteen',
-                theme: userData.isDarkMode ? darkTheme : lightTheme,
-                home: authSnapshot.hasData && userData.uid.isNotEmpty
-                    ? const TabsScreen()
-                    : const AuthScreen(),
-                routes: {
-                  CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
-                },
-                onGenerateRoute: (settings) {
-                  final uri = Uri.parse(settings.name!);
-
-                  switch (uri.path) {
-                    case GameScreen.routeName:
-                      final gameId = uri.queryParameters['id'];
-                      return Helpers.buildGameScreenRoute(
-                        gameId!,
-                        authSnapshot.data?.uid ?? '',
-                        settings,
-                      );
-                    default:
-                      return MaterialPageRoute(
-                        builder: (_) => const TabsScreen(),
-                      );
-                  }
-                },
-              );
-            },
-          ),
+              default:
+                return MaterialPageRoute(
+                  builder: (_) => const TabsScreen(),
+                );
+            }
+          },
         );
       },
+      loading: () => const Loading(),
+      error: (err, stack) => const Center(child: CircularProgressIndicator()),
     );
   }
 }

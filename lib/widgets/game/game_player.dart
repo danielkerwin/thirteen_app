@@ -29,50 +29,54 @@ class GamePlayer extends StatelessWidget {
     return Expanded(
       child: SizedBox(
         height: 50,
-        child: Stack(
-          alignment: Alignment.center,
-          fit: StackFit.expand,
-          children: [
-            Card(
-              shadowColor: isSkipped ? Colors.transparent : null,
-              color: isSkipped
-                  ? theme.disabledColor.withOpacity(0.1)
-                  : isActive
-                      ? activeColor
-                      : null,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  FittedBox(
-                    child: Text(
-                      isMe ? 'Me' : nickname,
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: isSkipped ? theme.disabledColor : activeText,
-                      ),
+        child: Card(
+          shadowColor: isSkipped ? Colors.transparent : null,
+          color: isSkipped
+              ? theme.disabledColor.withOpacity(0.1)
+              : isActive
+                  ? activeColor
+                  : null,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: FittedBox(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (rank == 0) ...[
+                          Icon(
+                            FontAwesomeIcons.solidTrophyAlt,
+                            color: isSkipped ? theme.disabledColor : activeText,
+                            size: 15,
+                          ),
+                          const SizedBox(width: 5),
+                        ],
+                        Text(
+                          isMe ? 'Me' : nickname,
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: isSkipped ? theme.disabledColor : activeText,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    '$cardCount cards',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: isSkipped ? theme.disabledColor : activeText,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            if (rank == 0)
-              Positioned(
-                left: 10,
-                child: Icon(
-                  FontAwesomeIcons.solidTrophyAlt,
-                  color: activeText,
                 ),
-              )
-          ],
+                Text(
+                  '$cardCount cards',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isSkipped ? theme.disabledColor : activeText,
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -10,6 +10,7 @@ final base = ThemeData(
 
 final darkTheme = base.copyWith(
   cardTheme: cardTheme,
+  visualDensity: VisualDensity.adaptivePlatformDensity,
   elevatedButtonTheme: elevatedButtonTheme,
   iconTheme: IconThemeData(color: base.colorScheme.primary),
   colorScheme: base.colorScheme.copyWith(

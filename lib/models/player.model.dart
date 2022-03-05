@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
+import '../services/database.service.dart';
 import 'game_card.model.dart';
 
 class PlayerInfo {
@@ -23,7 +22,7 @@ class PlayerHand {
     return const PlayerHand(cards: []);
   }
 
-  factory PlayerHand.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory PlayerHand.fromFirestore(DocSnapshot doc) {
     Map<String, dynamic> data = doc.data() ?? {};
     List<dynamic> cards = data['cards'] ?? [];
     return PlayerHand(

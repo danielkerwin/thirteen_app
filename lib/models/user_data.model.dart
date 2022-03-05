@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/database.service.dart';
 
 class UserData {
   final String uid;
@@ -15,7 +15,7 @@ class UserData {
     return UserData(nickname: '', uid: '', isDarkMode: isDarkMode);
   }
 
-  factory UserData.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory UserData.fromFirestore(DocSnapshot doc) {
     Map<String, dynamic> data = doc.data() ?? {};
     return UserData(
       uid: doc.id,

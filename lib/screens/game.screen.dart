@@ -1,14 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/player.model.dart';
+import '../providers/providers.dart';
 import '../widgets/game/game_hand.dart';
 import '../widgets/game/game_manager.dart';
 import '../widgets/game/game_players.dart';
 import '../widgets/game/game_table.dart';
+import '../widgets/main/loading.dart';
 
-class GameScreen extends StatelessWidget {
+class GameScreen extends ConsumerWidget {
   static const routeName = '/game';
   final String gameId;
   const GameScreen({
@@ -17,10 +17,10 @@ class GameScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     print('building game_screen');
     final theme = Theme.of(context);
-    final userId = FirebaseAuth.instance.currentUser?.uid;
+    final gameAsync = ref.watch(gameProvider(gameId));
 
     return Scaffold(
       appBar: AppBar(
@@ -42,36 +42,37 @@ class GameScreen extends StatelessWidget {
           )
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.all(4.0),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              theme.primaryColor.withOpacity(0),
-              theme.primaryColor.withOpacity(0.5),
-            ],
-          ),
-        ),
-        child: Column(
-          children: [
-            GamePlayers(gameId: gameId, userId: userId!),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [GameTable(gameId: gameId)],
+      body: gameAsync.when(
+        error: (err, stack) => const Center(child: Text('Error')),
+        loading: () => const Loading(),
+        data: (game) => Container(
+          padding: const EdgeInsets.all(4.0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                theme.primaryColor.withOpacity(0),
+                theme.primaryColor.withOpacity(0.5),
+              ],
             ),
-            GameManager(gameId: gameId, userId: userId),
-            Expanded(
-              child: Consumer<PlayerHand>(
-                builder: (_, playerHand, __) => GameHand(
-                  gameId: gameId,
-                  cards: playerHand.cards,
+          ),
+          child: Column(
+            children: [
+              GamePlayers(game: game),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [GameTable(game: game)],
+              ),
+              GameManager(game: game),
+              Expanded(
+                child: GameHand(
+                  game: game,
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

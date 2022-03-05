@@ -1,118 +1,116 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/audio.constant.dart';
 import '../../helpers/helpers.dart';
+import '../../providers/providers.dart';
 import '../../models/game.model.dart';
 import '../../services/database.service.dart';
 
-class GameManager extends StatefulWidget {
-  final String gameId;
-  final String userId;
+class GameManager extends ConsumerStatefulWidget {
+  final Game game;
 
   const GameManager({
     Key? key,
-    required this.gameId,
-    required this.userId,
+    required this.game,
   }) : super(key: key);
 
   @override
   _GameManagerState createState() => _GameManagerState();
 }
 
-class _GameManagerState extends State<GameManager> {
-  bool _isComplete = false;
+class _GameManagerState extends ConsumerState<GameManager> {
   bool _isLoading = false;
 
   Future<void> _joinGame() async {
     setState(() => _isLoading = true);
+
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
+    var message = 'You have joined the game!';
     try {
-      await DatabaseService.joinGame(widget.gameId);
-      messenger.showSnackBar(
-        Helpers.getSnackBar('You have joined the game!'),
-      );
+      await ref.read(databaseProvider)!.joinGame(widget.game.id);
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     } on FirebaseFunctionsException catch (err) {
-      messenger.showSnackBar(
-        Helpers.getSnackBar(err.message ?? 'Failed to join game'),
-      );
+      message = err.message ?? 'Failed to join game';
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     } catch (err) {
-      messenger.showSnackBar(
-        Helpers.getSnackBar('Unknown error occurred'),
-      );
+      message = 'Unknown error occurred';
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     }
+
     setState(() => _isLoading = false);
   }
 
   Future<void> _startGame() async {
-    final audio = Provider.of<AudioCache>(context, listen: false);
     setState(() => _isLoading = true);
+
+    final audio = ref.read(audioProvider);
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
+    var message = 'Game started!';
     try {
-      await DatabaseService.startGame(widget.gameId);
-      await audio.play(Audio.startGame);
-      messenger.showSnackBar(Helpers.getSnackBar('Game started!'));
+      await ref.read(databaseProvider)!.startGame(widget.game.id);
+      audio.play(Audio.startGame);
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     } on FirebaseFunctionsException catch (err) {
-      await audio.play(Audio.playCardError);
-      messenger.showSnackBar(
-        Helpers.getSnackBar(err.message ?? 'Failed to start game'),
-      );
+      audio.play(Audio.playCardError);
+      message = err.message ?? 'Failed to start game';
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     } catch (err) {
-      await audio.play(Audio.playCardError);
-      messenger.showSnackBar(
-        Helpers.getSnackBar('Unknown error occurred'),
-      );
+      audio.play(Audio.playCardError);
+      message = 'Unknown error occurred';
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     }
 
     setState(() => _isLoading = false);
   }
 
   Future<void> _checkGameStatus(Game game) async {
-    if (!_isComplete && game.isComplete) {
-      _isComplete = true;
-      final audio = Provider.of<AudioCache>(context);
+    if (game.isComplete) {
+      final audio = ref.read(audioProvider);
       if (game.isWinner) {
-        await audio.play(Audio.gameWin);
+        audio.play(Audio.gameWin);
       } else {
-        await audio.play(Audio.gameLost);
+        audio.play(Audio.gameLost);
       }
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    _checkGameStatus(widget.game);
+  }
+
+  @override
   Widget build(BuildContext context) {
     print('building game_manager');
-    final game = Provider.of<Game>(context);
 
-    _checkGameStatus(game);
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (!game.isJoined && game.isCreated)
-          ElevatedButton(
-            child: _isLoading
-                ? const CircularProgressIndicator.adaptive()
-                : const Text('Join Game'),
-            onPressed: _isLoading ? null : _joinGame,
-          ),
-        if (game.isCreatedByMe && game.isCreated)
-          Center(
-            child: ElevatedButton(
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (!widget.game.isJoined && widget.game.isCreated)
+            ElevatedButton(
               child: _isLoading
                   ? const CircularProgressIndicator.adaptive()
-                  : const Text('Start game'),
-              onPressed: _isLoading ? null : _startGame,
+                  : const Text('Join Game'),
+              onPressed: _isLoading ? null : _joinGame,
             ),
-          ),
-        if (game.isComplete)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
+          if (widget.game.isCreatedByMe && widget.game.isCreated)
+            Center(
+              child: ElevatedButton(
+                child: _isLoading
+                    ? const CircularProgressIndicator.adaptive()
+                    : const Text('Start game'),
+                onPressed: _isLoading ? null : _startGame,
+              ),
+            ),
+          if (widget.game.isComplete)
+            Column(
               children: [
                 const Text(
                   'Game over',
@@ -120,16 +118,16 @@ class _GameManagerState extends State<GameManager> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  '${game.winningPlayerName} wins',
+                  '${widget.game.winningPlayerName} wins',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 )
               ],
-            ),
-          )
-      ],
+            )
+        ],
+      ),
     );
   }
 }

@@ -1,18 +1,20 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/providers.dart';
 import '../../models/game.model.dart';
 import '../../models/game_card.model.dart';
 import '../../models/moves.model.dart';
+import '../main/loading.dart';
 import 'game_card_item.dart';
 
-class GameTable extends StatelessWidget {
-  final String gameId;
+class GameTable extends ConsumerWidget {
+  final Game game;
   const GameTable({
     Key? key,
-    required this.gameId,
+    required this.game,
   }) : super(key: key);
 
   List<Widget> _buildCardsOnTable(
@@ -55,97 +57,106 @@ class GameTable extends StatelessWidget {
     ).toList();
   }
 
-  List<GameMoves> _filterRound(Game game, List<GameMoves> moves) {
+  List<GameMoves> _filterRound(Game? game, List<GameMoves>? moves) {
+    if (game == null || moves == null) {
+      return [];
+    }
     return moves.where((move) => move.round >= game.round).toList();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
     print('building game_table');
 
-    final moves = Provider.of<List<GameMoves>>(context);
-    final game = Provider.of<Game>(context);
+    final movesAsync = ref.watch(gameMovesProvider(game.id));
 
-    final roundMoves = _filterRound(game, moves);
-
-    List<GameCard> previousCards =
-        roundMoves.length > 1 ? roundMoves[1].cards : [];
-    List<GameCard> latestCards =
-        roundMoves.isNotEmpty ? roundMoves[0].cards : [];
-
-    return Container(
-      width: mediaQuery.size.width * 0.6,
-      height: mediaQuery.size.height / 2 * 0.5,
-      constraints: const BoxConstraints(maxWidth: 500),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: game.isActivePlayer
-              ? theme.colorScheme.primary
-              : theme.colorScheme.secondary,
-          width: 0.7,
-        ),
-        borderRadius: const BorderRadius.all(Radius.circular(20)),
+    return movesAsync.when(
+      error: (err, stack) => const Center(
+        child: Text('Error'),
       ),
-      child: LayoutBuilder(
-        builder: (ctx, contraints) => Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
-          children: [
-            if (latestCards.isEmpty)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (!game.isActive)
-                    Text(
-                      'Waiting for ${game.createdByName} to start the game',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: theme.colorScheme.secondary,
-                      ),
-                    )
-                  else ...[
-                    Text(
-                      'Round ${game.round}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: game.isActivePlayer
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.secondary,
-                      ),
-                    ),
-                    Text(
-                      '${game.activePlayerName} starts',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: game.isActivePlayer
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.secondary,
-                      ),
-                    )
-                  ]
-                ],
-              ),
-            ..._buildCardsOnTable(
-              previousCards,
-              contraints,
-              mediaQuery,
-              true,
+      loading: () => const Loading(),
+      data: (moves) {
+        final roundMoves = _filterRound(game, moves);
+        List<GameCard> previousCards =
+            roundMoves.length > 1 ? roundMoves[1].cards : [];
+        List<GameCard> latestCards =
+            roundMoves.isNotEmpty ? roundMoves[0].cards : [];
+
+        return Container(
+          width: mediaQuery.size.width * 0.6,
+          height: mediaQuery.size.height / 2 * 0.5,
+          constraints: const BoxConstraints(maxWidth: 500),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: game.isActivePlayer
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.secondary,
+              width: 0.7,
             ),
-            ..._buildCardsOnTable(
-              latestCards,
-              contraints,
-              mediaQuery,
-              false,
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+          ),
+          child: LayoutBuilder(
+            builder: (ctx, contraints) => Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                if (latestCards.isEmpty)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (!game.isActive)
+                        Text(
+                          'Waiting for ${game.createdByName} to start the game',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: theme.colorScheme.secondary,
+                          ),
+                        )
+                      else ...[
+                        Text(
+                          'Round ${game.round}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: game.isActivePlayer
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.secondary,
+                          ),
+                        ),
+                        Text(
+                          '${game.activePlayerName} starts',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: game.isActivePlayer
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.secondary,
+                          ),
+                        )
+                      ]
+                    ],
+                  ),
+                ..._buildCardsOnTable(
+                  previousCards,
+                  contraints,
+                  mediaQuery,
+                  true,
+                ),
+                ..._buildCardsOnTable(
+                  latestCards,
+                  contraints,
+                  mediaQuery,
+                  false,
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

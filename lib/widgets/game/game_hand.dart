@@ -1,47 +1,45 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/audio.constant.dart';
 import '../../helpers/helpers.dart';
+import '../../providers/providers.dart';
 import '../../models/game.model.dart';
 import '../../models/game_card.model.dart';
-import '../../services/database.service.dart';
+import '../main/loading.dart';
 import 'game_card_item.dart';
 
-class GameHand extends StatefulWidget {
-  final String gameId;
-  final List<GameCard> cards;
+class GameHand extends ConsumerStatefulWidget {
+  final Game game;
 
   const GameHand({
     Key? key,
-    required this.gameId,
-    required this.cards,
+    required this.game,
   }) : super(key: key);
 
   @override
   _GameHandState createState() => _GameHandState();
 }
 
-class _GameHandState extends State<GameHand> {
-  final Set<String> _selectedCards = {};
+class _GameHandState extends ConsumerState<GameHand> {
+  final Set<GameCard> _selectedCards = {};
   bool _isLoading = false;
 
-  void _toggleCardSelection(String id) async {
-    final audio = Provider.of<AudioCache>(context, listen: false);
+  void _toggleCardSelection(GameCard card) async {
+    final audio = ref.read(audioProvider);
     audio.play(Audio.selectCard);
     setState(() {
-      if (_selectedCards.contains(id)) {
-        _selectedCards.remove(id);
+      if (_selectedCards.contains(card)) {
+        _selectedCards.remove(card);
       } else {
-        _selectedCards.add(id);
+        _selectedCards.add(card);
       }
     });
   }
 
-  void _playSelectedCards(Game game) async {
-    final audio = Provider.of<AudioCache>(context, listen: false);
+  void _playSelectedCards() async {
+    final audio = ref.read(audioProvider);
     if (_selectedCards.isEmpty) {
       return;
     }
@@ -49,9 +47,9 @@ class _GameHandState extends State<GameHand> {
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
 
-    if (!game.isActivePlayer) {
-      final activePlayer = game.activePlayerName;
-      await audio.play(Audio.playCardError);
+    if (!widget.game.isActivePlayer) {
+      final activePlayer = widget.game.activePlayerName;
+      audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar(
           'You\'re not the active player - it\'s $activePlayer\'s turn',
@@ -62,22 +60,21 @@ class _GameHandState extends State<GameHand> {
 
     setState(() => _isLoading = true);
 
-    final cardsToPlay =
-        widget.cards.where((card) => _selectedCards.contains(card.id)).toList();
+    final cardsToPlay = _selectedCards.toList();
 
     try {
-      await DatabaseService.playHand(widget.gameId, cardsToPlay);
-      await audio.play(Audio.playCardSuccess);
+      await ref.read(databaseProvider)!.playHand(widget.game.id, cardsToPlay);
+      audio.play(Audio.playCardSuccess);
       setState(() {
         _selectedCards.clear();
       });
     } on FirebaseFunctionsException catch (err) {
-      await audio.play(Audio.playCardError);
+      audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar(err.message ?? 'Failed to play hand'),
       );
     } catch (err) {
-      await audio.play(Audio.playCardError);
+      audio.play(Audio.playCardError);
       messenger.showSnackBar(
         Helpers.getSnackBar('Unknown error occurred'),
       );
@@ -85,39 +82,35 @@ class _GameHandState extends State<GameHand> {
     setState(() => _isLoading = false);
   }
 
-  void _skipRound(Game game) async {
+  void _skipRound() async {
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
+    var message = 'You\'ve skipped this round';
 
-    if (!game.isActivePlayer) {
-      final activePlayer = game.activePlayerName;
-      messenger.showSnackBar(
-        Helpers.getSnackBar(
-          'You\'re not the active player - it\'s $activePlayer\'s turn',
-        ),
-      );
+    if (!widget.game.isActivePlayer) {
+      final activePlayer = widget.game.activePlayerName;
+      message = 'You\'re not the active player - it\'s $activePlayer\'s turn';
+      messenger.showSnackBar(Helpers.getSnackBar(message));
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      await DatabaseService.skipRound(widget.gameId);
+      await ref.read(databaseProvider)!.skipRound(widget.game.id);
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     } on FirebaseFunctionsException catch (err) {
-      messenger.showSnackBar(
-        Helpers.getSnackBar(err.message ?? 'Failed to skip round'),
-      );
+      message = err.message ?? 'Failed to skip round';
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     } catch (err) {
-      messenger.showSnackBar(
-        Helpers.getSnackBar('Unknown error occurred'),
-      );
+      message = 'Unknown error';
+      messenger.showSnackBar(Helpers.getSnackBar(message));
     }
 
     setState(() => _isLoading = false);
   }
 
   Widget _buildCard({
-    required Game game,
     required BuildContext context,
     required GameCard pickedCard,
     required double left,
@@ -134,8 +127,8 @@ class _GameHandState extends State<GameHand> {
         origin: const Offset(65, 100),
         transform: Matrix4.rotationZ(rotation),
         child: GestureDetector(
-          onVerticalDragEnd: (_) => _playSelectedCards(game),
-          onTap: () => _toggleCardSelection(pickedCard.id),
+          onVerticalDragEnd: (_) => _playSelectedCards(),
+          onTap: () => _toggleCardSelection(pickedCard),
           child: GameCardItem(
             key: ValueKey(pickedCard.id),
             label: pickedCard.label,
@@ -150,7 +143,7 @@ class _GameHandState extends State<GameHand> {
   }
 
   List<Widget> _buildCardsLayout(
-    Game game,
+    List<GameCard> cards,
     BuildContext context,
     MediaQueryData mediaQuery,
   ) {
@@ -158,7 +151,7 @@ class _GameHandState extends State<GameHand> {
     final deviceSize = mediaQuery.size;
 
     final size = deviceSize.width;
-    final totalCards = widget.cards.length;
+    final totalCards = cards.length;
     const leftStart = 30;
     const rotationStart = -0.55;
     final rotationModifier = ((rotationStart * 2) / totalCards).abs();
@@ -169,13 +162,12 @@ class _GameHandState extends State<GameHand> {
       final isHalfWay = index >= totalCards / 2;
       bottom = isHalfWay ? bottom - bottomModifier : bottom + bottomModifier;
       return _buildCard(
-        game: game,
         context: context,
-        pickedCard: widget.cards[index],
+        pickedCard: cards[index],
         left: leftStart + (index * ((size - leftStart * 3) / totalCards)),
         bottom: bottom,
         rotation: rotationStart + (index * rotationModifier),
-        isSelected: _selectedCards.contains(widget.cards[index].id),
+        isSelected: _selectedCards.contains(cards[index]),
       );
     });
   }
@@ -186,16 +178,16 @@ class _GameHandState extends State<GameHand> {
     });
   }
 
-  bool _canSkip(Game game) {
-    return game.isActivePlayer &&
-        !game.isSkippedRound &&
+  bool _canSkip() {
+    return widget.game.isActivePlayer &&
+        !widget.game.isSkippedRound &&
         !_isLoading &&
-        game.isActive &&
-        game.turn != 1;
+        widget.game.isActive &&
+        widget.game.turn != 1;
   }
 
-  bool _canPlay(Game game) {
-    return _selectedCards.isNotEmpty && !_isLoading && game.isActive;
+  bool _canPlay() {
+    return _selectedCards.isNotEmpty && !_isLoading && widget.game.isActive;
   }
 
   @override
@@ -203,66 +195,72 @@ class _GameHandState extends State<GameHand> {
     print('Building game_hand');
     final mediaQuery = MediaQuery.of(context);
     final theme = Theme.of(context);
-    final game = Provider.of<Game>(context);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Opacity(
-                opacity: _isLoading ? 0.8 : 1.0,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: _buildCardsLayout(
-                    game,
-                    context,
-                    mediaQuery,
+    final gameHandAsync = ref.watch(playerHandProvider(widget.game.id));
+    return gameHandAsync.when(
+        error: (err, stack) => const Center(
+              child: Text('Error'),
+            ),
+        loading: () => const Loading(),
+        data: (gameHand) => Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Opacity(
+                        opacity: _isLoading ? 0.8 : 1.0,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: _buildCardsLayout(
+                            gameHand.cards,
+                            context,
+                            mediaQuery,
+                          ),
+                        ),
+                      ),
+                      if (_isLoading)
+                        CircularProgressIndicator.adaptive(
+                          backgroundColor: theme.primaryColor,
+                        )
+                    ],
                   ),
                 ),
-              ),
-              if (_isLoading)
-                CircularProgressIndicator.adaptive(
-                  backgroundColor: theme.primaryColor,
-                )
-            ],
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton(
-              onPressed: _canSkip(game) ? () => _skipRound(game) : null,
-              child: const Text('Skip'),
-              style: ElevatedButton.styleFrom(
-                primary: theme.colorScheme.secondary,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed:
-                      _canPlay(game) ? () => _playSelectedCards(game) : null,
-                  child: Text('Play ${_selectedCards.length} selected'),
-                  style: ElevatedButton.styleFrom(
-                      // primary: theme.primaryColor,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _canSkip() ? () => _skipRound() : null,
+                      child: const Text('Skip'),
+                      style: ElevatedButton.styleFrom(
+                        primary: theme.colorScheme.secondary,
                       ),
-                ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed:
+                              _canPlay() ? () => _playSelectedCards() : null,
+                          child: Text('Play ${_selectedCards.length} selected'),
+                          style: ElevatedButton.styleFrom(
+                              // primary: theme.primaryColor,
+                              ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: _selectedCards.isEmpty || _isLoading
+                          ? null
+                          : _unselectCards,
+                      child: const Text('Unselect'),
+                      style: ElevatedButton.styleFrom(
+                        primary: theme.colorScheme.secondary,
+                      ),
+                    ),
+                  ],
+                )
               ],
-            ),
-            ElevatedButton(
-              onPressed:
-                  _selectedCards.isEmpty || _isLoading ? null : _unselectCards,
-              child: const Text('Unselect'),
-              style: ElevatedButton.styleFrom(
-                primary: theme.colorScheme.secondary,
-              ),
-            ),
-          ],
-        )
-      ],
-    );
+            ));
   }
 }

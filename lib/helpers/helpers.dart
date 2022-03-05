@@ -1,11 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../models/game.model.dart';
-import '../models/moves.model.dart';
-import '../models/player.model.dart';
-import '../screens/game.screen.dart';
-import '../services/database.service.dart';
 
 class Helpers {
   static SnackBar getSnackBar(String message) {
@@ -15,47 +8,6 @@ class Helpers {
         message,
         style: const TextStyle(fontFamily: 'Roboto'),
       ),
-    );
-  }
-
-  static buildGameScreenRoute(
-    String gameId,
-    String userId,
-    RouteSettings settings,
-  ) {
-    if (userId.isEmpty) {
-      return MaterialPageRoute(
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        settings: settings,
-      );
-    }
-
-    return MaterialPageRoute(
-      builder: (ctx) {
-        return MultiProvider(
-          providers: [
-            StreamProvider<Game>.value(
-              value: DatabaseService.getGameStream(gameId),
-              initialData: Game.fromEmpty(),
-            ),
-            StreamProvider<List<GameMoves>>.value(
-              value: DatabaseService.getMovesStream(gameId),
-              initialData: const [],
-            ),
-            StreamProvider<PlayerHand>.value(
-              value: DatabaseService.getPlayerHandStream(
-                gameId,
-                userId,
-              ),
-              initialData: PlayerHand.fromEmpty(),
-            )
-          ],
-          child: GameScreen(gameId: gameId),
-        );
-      },
-      settings: settings,
     );
   }
 }

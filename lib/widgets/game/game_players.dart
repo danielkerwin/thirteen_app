@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/game.model.dart';
 import 'game_player.dart';
 
-class GamePlayers extends StatelessWidget {
-  final String gameId;
-  final String userId;
+class GamePlayers extends ConsumerWidget {
+  final Game game;
 
   const GamePlayers({
     Key? key,
-    required this.gameId,
-    required this.userId,
+    required this.game,
   }) : super(key: key);
 
   List<Widget> buildPlayers(Game game) {
@@ -27,8 +25,8 @@ class GamePlayers extends StatelessWidget {
             cardCount: player.cardCount,
             nickname: player.nickname,
             isActive: isActive,
-            isMe: userId == id,
-            isSkipped: player.round > game.round,
+            isMe: game.userId == id,
+            isSkipped: player.round > game.round || player.cardCount == 0,
           ),
         );
       }
@@ -37,9 +35,8 @@ class GamePlayers extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     print('building game_players');
-    final game = Provider.of<Game>(context);
     return Column(
       children: [
         Row(

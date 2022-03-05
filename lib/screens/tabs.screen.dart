@@ -1,10 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../models/game.model.dart';
 import '../models/tab_item.model.dart';
-import '../services/database.service.dart';
 import 'create_game.screen.dart';
 import 'game.screen.dart';
 import 'games.screen.dart';
@@ -73,16 +69,8 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   void initState() {
     super.initState();
-    final userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     _tabs.addAll([
-      TabItem(
-        screen: StreamProvider<List<Game>>.value(
-          initialData: const [],
-          value: DatabaseService.getGamesStream(userId),
-          child: const GamesScreen(),
-        ),
-        title: 'title',
-      ),
+      const TabItem(screen: GamesScreen(), title: 'title'),
       const TabItem(screen: ScoreboardScreen(), title: 'title'),
       const TabItem(screen: SettingsScreen(), title: 'title')
     ]);

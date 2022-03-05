@@ -1,22 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nanoid/async.dart';
 
 import '../constants/nanoid.constant.dart';
-import '../services/database.service.dart';
+import '../providers/providers.dart';
 import 'game.screen.dart';
 
-class CreateGameScreen extends StatefulWidget {
+class CreateGameScreen extends ConsumerStatefulWidget {
   static const routeName = '/create-game';
 
   const CreateGameScreen({Key? key}) : super(key: key);
 
   @override
-  State<CreateGameScreen> createState() => _CreateGameScreenState();
+  _CreateGameScreenState createState() => _CreateGameScreenState();
 }
 
-class _CreateGameScreenState extends State<CreateGameScreen> {
+class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
   bool _enableBombs = false;
   bool _enableInstantWins = false;
   bool _enableTimeLimit = false;
@@ -33,7 +34,8 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
         .doc(user!.uid)
         .get();
     final gameId = await customAlphabet(nanoidCharacters, 5);
-    await DatabaseService.createGame(gameId, user.uid, userData['nickname']);
+    final database = ref.read(databaseProvider)!;
+    await database.createGame(gameId, userData['nickname']);
 
     Navigator.of(context).popAndPushNamed(
       '${GameScreen.routeName}?id=$gameId',

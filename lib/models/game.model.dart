@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
+import '../services/database.service.dart';
 import 'player.model.dart';
 
 enum GameStatus { created, active, complete }
@@ -17,6 +17,7 @@ class Game {
   final List<String> rankIds;
   final int round;
   final int turn;
+  final String userId;
 
   Game({
     required this.status,
@@ -30,30 +31,26 @@ class Game {
     required this.rankIds,
     required this.round,
     required this.turn,
+    required this.userId,
   });
 
   bool get isCreatedByMe {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
     return userId == createdById;
   }
 
   bool get isJoined {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
     return players[userId] != null;
   }
 
   bool get isActivePlayer {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
     return activePlayerId == userId;
   }
 
   bool get isWinner {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
     return rankIds.isNotEmpty ? rankIds[0] == userId : false;
   }
 
   bool get isSkippedRound {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
     return (players[userId]?.round ?? 0) > round;
   }
 
@@ -103,10 +100,11 @@ class Game {
       rankIds: [],
       round: 1,
       turn: 1,
+      userId: '',
     );
   }
 
-  factory Game.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory Game.fromFirestore(DocSnapshot doc, String userId) {
     Map<String, dynamic> gameData = doc.data() ?? {};
     final status = _getStatus(gameData['status'] ?? 0);
     Map<String, dynamic> players = gameData['players'] ?? {};
@@ -134,6 +132,7 @@ class Game {
       rankIds: rankIds.map((id) => id.toString()).toList(),
       round: gameData['round'] ?? 1,
       turn: gameData['turn'] ?? 1,
+      userId: userId,
     );
   }
 }

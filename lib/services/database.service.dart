@@ -10,28 +10,28 @@ import '../models/moves.model.dart';
 import '../models/player.model.dart';
 import '../models/user_data.model.dart';
 
-typedef DocStream = DocumentSnapshot<Map<String, dynamic>>;
-typedef CollectionStream = QuerySnapshot<Map<String, dynamic>>;
+typedef DocSnapshot = DocumentSnapshot<Map<String, dynamic>>;
+typedef ColSnapshot = QuerySnapshot<Map<String, dynamic>>;
 
 class DatabaseService {
-  static Future<UserData> getUserFuture(String userId) async {
+  final String userId;
+
+  DatabaseService({required this.userId});
+
+  Future<UserData> getUserFuture() async {
     final snapshot =
         await FirebaseFirestore.instance.doc('users/$userId').get();
     return UserData.fromFirestore(snapshot);
   }
 
-  static Stream<UserData> getUserStream(String? userId,
-      [bool isDarkMode = false]) {
-    if (userId == null) {
-      return Stream.value(UserData.fromEmpty(isDarkMode));
-    }
+  Stream<UserData> getUserStream() {
     return FirebaseFirestore.instance
         .doc('users/$userId')
         .snapshots()
         .map((snapshot) => UserData.fromFirestore(snapshot));
   }
 
-  static Future<void> toggleDarkMode(String userId, bool isDarkMode) async {
+  Future<void> toggleDarkMode(bool isDarkMode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isDarkMode', isDarkMode);
     return FirebaseFirestore.instance.doc('users/$userId').set(
@@ -40,9 +40,8 @@ class DatabaseService {
     );
   }
 
-  static Future<void> createGame(
+  Future<void> createGame(
     String gameId,
-    String userId,
     String nickname,
   ) async {
     final gamePath = 'games/$gameId';
@@ -66,26 +65,26 @@ class DatabaseService {
     });
   }
 
-  static Future joinGame(String gameId) async {
+  Future joinGame(String gameId) async {
     final joinGame =
         FirebaseFunctions.instanceFor(region: 'australia-southeast1')
             .httpsCallable('joinGame');
     return joinGame.call({'gameId': gameId});
   }
 
-  static Future startGame(String gameId) async {
+  Future startGame(String gameId) async {
     final startGame =
         FirebaseFunctions.instanceFor(region: 'australia-southeast1')
             .httpsCallable('startGame');
     return startGame.call({'gameId': gameId});
   }
 
-  static Future<void> deleteGame(String gameId) async {
+  Future<void> deleteGame(String gameId) async {
     final gamePath = 'games/$gameId';
     return FirebaseFirestore.instance.doc(gamePath).delete();
   }
 
-  static Future playHand(
+  Future playHand(
     String gameId,
     List<GameCard> selected,
   ) async {
@@ -106,32 +105,35 @@ class DatabaseService {
     });
   }
 
-  static Future skipRound(String gameId) async {
+  Future skipRound(String gameId) async {
     final skipRound =
         FirebaseFunctions.instanceFor(region: 'australia-southeast1')
             .httpsCallable('skipRound');
     return skipRound.call({'gameId': gameId});
   }
 
-  static Stream<List<Game>> getGamesStream(String userId) {
+  Stream<List<Game>> getGamesStream() {
     return FirebaseFirestore.instance
         .collection('games')
         .where('playerIds', arrayContains: userId)
+        .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => Game.fromFirestore(doc)).toList();
+      return snapshot.docs
+          .map((doc) => Game.fromFirestore(doc, userId))
+          .toList();
     });
   }
 
-  static Stream<Game> getGameStream(String gameId) {
+  Stream<Game> getGameStream(String gameId) {
     return FirebaseFirestore.instance
         .collection('games')
         .doc(gameId)
         .snapshots()
-        .map((snapshot) => Game.fromFirestore(snapshot));
+        .map((snapshot) => Game.fromFirestore(snapshot, userId));
   }
 
-  static Stream<PlayerHand> getPlayerHandStream(String gameId, String userId) {
+  Stream<PlayerHand> getPlayerHandStream(String gameId) {
     return FirebaseFirestore.instance
         .doc('games/$gameId/players/$userId')
         .snapshots()
@@ -140,7 +142,7 @@ class DatabaseService {
         );
   }
 
-  static Stream<List<GameMoves>> getMovesStream(String gameId) {
+  Stream<List<GameMoves>> getMovesStream(String gameId) {
     return FirebaseFirestore.instance
         .collection('games/$gameId/moves')
         .orderBy('createdAt', descending: true)

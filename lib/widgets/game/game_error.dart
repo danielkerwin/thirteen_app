@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 class GameError extends StatelessWidget {
   final String gameId;
-  const GameError({Key? key, required this.gameId}) : super(key: key);
+  const GameError({
+    Key? key,
+    required this.gameId,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class GameError extends StatelessWidget {
             ],
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).pushReplacementNamed('/'),
             child: Text(
               'Go Back',
               style: TextStyle(

@@ -1,32 +1,37 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/user_data.model.dart';
-import '../services/database.service.dart';
+import '../providers/providers.dart';
+import '../widgets/main/loading.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   static const routeName = '/settings';
   const SettingsScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     print('build settings_screen');
-    final userData = Provider.of<UserData>(context);
-
-    return ListView(
-      padding: const EdgeInsets.all(8.0),
-      children: [
-        SwitchListTile.adaptive(
-          onChanged: (val) => DatabaseService.toggleDarkMode(userData.uid, val),
-          value: userData.isDarkMode,
-          title: const Text('Toggle Dark Mode'),
-        ),
-        OutlinedButton(
-          onPressed: FirebaseAuth.instance.signOut,
-          child: const Text('Sign out'),
-        )
-      ],
+    final userDataAsync = ref.watch(userDataProvider);
+    return userDataAsync.when(
+      error: (err, stack) => const Center(child: Text('Error')),
+      loading: () => const Loading(),
+      data: (user) => ListView(
+        padding: const EdgeInsets.all(8.0),
+        children: [
+          SwitchListTile.adaptive(
+            onChanged: (val) {
+              ref.read(databaseProvider)!.toggleDarkMode(val);
+            },
+            value: user.isDarkMode,
+            title: const Text('Toggle Dark Mode'),
+          ),
+          OutlinedButton(
+            onPressed: FirebaseAuth.instance.signOut,
+            child: const Text('Sign out'),
+          )
+        ],
+      ),
     );
   }
 }

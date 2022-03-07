@@ -105,9 +105,18 @@ class GameTable extends ConsumerWidget {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (!game.isActive)
+                      if (!game.isActive && game.createdByName.isNotEmpty)
                         Text(
                           'Waiting for ${game.createdByName} to start the game',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: theme.colorScheme.secondary,
+                          ),
+                        )
+                      else if (game.createdByName.isEmpty)
+                        Text(
+                          'Invalid game code\nPlease try again',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,

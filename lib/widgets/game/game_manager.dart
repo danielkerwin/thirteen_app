@@ -91,7 +91,9 @@ class _GameManagerState extends ConsumerState<GameManager> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (!widget.game.isJoined && widget.game.isCreated)
+          if (!widget.game.isJoined &&
+              widget.game.isCreated &&
+              widget.game.createdByName.isNotEmpty)
             ElevatedButton(
               child: _isLoading
                   ? const CircularProgressIndicator.adaptive()

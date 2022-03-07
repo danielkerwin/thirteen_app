@@ -67,7 +67,10 @@ class _CreateGameScreenState extends ConsumerState<CreateGameScreen> {
             ],
           ),
           const Divider(),
-          const Text('Advanced Settings are currently disabled'),
+          const Text(
+            'Advanced Settings - coming soon',
+            style: TextStyle(color: Colors.grey),
+          ),
           Expanded(
             child: ListView(
               children: [

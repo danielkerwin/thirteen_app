@@ -27,7 +27,6 @@ dependencies:
   rxdart: ^0.27.3
   audioplayers: ^0.20.1
   flutter_riverpod: ^1.0.3
-  firebase_messaging: ^11.2.8
 
 dependency_overrides:
   font_awesome_flutter:

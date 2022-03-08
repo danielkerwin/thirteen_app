@@ -13,9 +13,9 @@ class Score {
     required this.ranksByPlayers,
   });
 
-  factory Score.fromFirestore(DocSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    final ranks = data['ranksByPlayers'] as Map<String, dynamic>;
+  factory Score.fromFirestore(DocSnapshot? doc) {
+    final data = doc?.data();
+    final ranks = data?['ranksByPlayers'] as Map<String, dynamic>? ?? {};
     final ranksByPlayers = ranks.map((players, player) {
       final ranksData = player as Map<String, dynamic>;
       return MapEntry(
@@ -26,9 +26,9 @@ class Score {
       );
     });
     return Score(
-      id: doc.id,
-      gamesPlayed: data['gamesPlayed'] ?? 0,
-      gamesWon: data['gamesWon'] ?? 0,
+      id: doc?.id ?? '',
+      gamesPlayed: data?['gamesPlayed'] ?? 0,
+      gamesWon: data?['gamesWon'] ?? 0,
       ranksByPlayers: ranksByPlayers,
     );
   }

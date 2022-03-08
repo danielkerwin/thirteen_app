@@ -14,6 +14,8 @@ class ScoreboardScreen extends ConsumerWidget {
 
     return scoreAsync.when(
       data: (score) {
+        final winRate = (score.gamesWon / score.gamesPlayed * 100);
+
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -37,7 +39,7 @@ class ScoreboardScreen extends ConsumerWidget {
                   ListTile(
                     title: const Text('Win rate'),
                     trailing: Text(
-                      '${(score.gamesWon / score.gamesPlayed * 100).toStringAsFixed(2)}%',
+                      '${(winRate.isNaN ? 0 : winRate).toStringAsFixed(2)}%',
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),

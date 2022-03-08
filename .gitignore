@@ -49,3 +49,5 @@ app.*.map.json
 .env
 /fa
 google_service_account.json
+
+.firebase

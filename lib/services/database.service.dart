@@ -18,20 +18,10 @@ typedef ColSnapshot = QuerySnapshot<Map<String, dynamic>>;
 
 class DatabaseService with ChangeNotifier {
   final String userId;
-  GameFilters? _gameFilters = GameFilters.active;
 
   DatabaseService({
     required this.userId,
   });
-
-  set gameFilters(GameFilters? filter) {
-    _gameFilters = filter;
-    notifyListeners();
-  }
-
-  GameFilters? get gameFilters {
-    return _gameFilters;
-  }
 
   Future<UserData> getUserFuture() async {
     final snapshot =
@@ -127,10 +117,7 @@ class DatabaseService with ChangeNotifier {
     return skipRound.call({'gameId': gameId});
   }
 
-  Stream<List<Game>> getGamesStream() {
-    final status = _gameFilters!.index == GameFilters.active.index
-        ? [GameStatus.created.index, GameStatus.active.index]
-        : [GameStatus.complete.index];
+  Stream<List<Game>> getGamesStream(List<int> status) {
     return FirebaseFirestore.instance
         .collection('games')
         .where('playerIds', arrayContains: userId)

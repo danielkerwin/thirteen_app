@@ -2,30 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../constants/game.constants.dart';
-import '../../providers/database.provider.dart';
+import '../../providers/filter.provider.dart';
 
-class GameFilter extends ConsumerStatefulWidget {
-  const GameFilter({Key? key}) : super(key: key);
+class GameFilter extends ConsumerWidget {
+  final GameFilters filters;
 
-  @override
-  _GameFilterState createState() => _GameFilterState();
-}
+  const GameFilter({
+    Key? key,
+    required this.filters,
+  }) : super(key: key);
 
-class _GameFilterState extends ConsumerState<GameFilter> {
-  GameFilters? _gameFilters = GameFilters.active;
-
-  void _setFilter(GameFilters? value) {
-    ref.read(databaseProvider)!.gameFilters = value;
+  void _setFilter(WidgetRef ref, GameFilters value) {
+    ref.read(filterProvider).gameFilter = value;
   }
 
   @override
-  void initState() {
-    super.initState();
-    _gameFilters = ref.read(databaseProvider)!.gameFilters!;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
@@ -35,14 +27,14 @@ class _GameFilterState extends ConsumerState<GameFilter> {
         children: [
           Radio<GameFilters>(
             value: GameFilters.active,
-            groupValue: _gameFilters,
-            onChanged: _setFilter,
+            groupValue: filters,
+            onChanged: (val) => _setFilter(ref, val!),
           ),
           const Text('Active games'),
           Radio<GameFilters>(
             value: GameFilters.complete,
-            groupValue: _gameFilters,
-            onChanged: _setFilter,
+            groupValue: filters,
+            onChanged: (val) => _setFilter(ref, val!),
           ),
           const Text('Completed games'),
         ],

@@ -17,7 +17,7 @@ export const updateScoresFunction = functions
           rankIndex > -1 ? rankIndex + 1 : gameDataAfter.playerIds.length;
         const update: GameScores = {
           gamesPlayed: admin.firestore.FieldValue.increment(1),
-          ranks: {
+          ranksByPlayers: {
             [gameDataAfter.playerIds.length]: {
               [rank]: admin.firestore.FieldValue.increment(1),
             },

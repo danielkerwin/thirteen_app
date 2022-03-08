@@ -49,7 +49,7 @@ export interface GameData {
 export interface GameScores {
   gamesPlayed: firestore.FieldValue;
   gamesWon?: firestore.FieldValue;
-  ranks: {
+  ranksByPlayers: {
     [players: number]: {
       [position: number]: firestore.FieldValue;
     };

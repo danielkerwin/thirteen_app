@@ -10,6 +10,7 @@ import '../models/game.model.dart';
 import '../models/game_card.model.dart';
 import '../models/game_moves.model.dart';
 import '../models/game_hand.model.dart';
+import '../models/score.model.dart';
 import '../models/user_data.model.dart';
 
 typedef DocSnapshot = DocumentSnapshot<Map<String, dynamic>>;
@@ -141,6 +142,14 @@ class DatabaseService with ChangeNotifier {
           .map((doc) => Game.fromFirestore(doc, userId))
           .toList();
     });
+  }
+
+  Stream<Score> getScoreStream() {
+    return FirebaseFirestore.instance
+        .collection('scores')
+        .doc(userId)
+        .snapshots()
+        .map((snapshot) => Score.fromFirestore(snapshot));
   }
 
   Stream<Game> getGameStream(String gameId) {

@@ -16,8 +16,8 @@ export const startGameFunction = functions
 
     const playerIds: string[] = gameData?.playerIds ?? [];
 
-    if (playerIds.length % 2 > 0) {
-      const message = 'Cannot start game - must be an even number of players';
+    if (playerIds.length < 2) {
+      const message = 'Cannot start game - must be at least 2 players';
       functions.logger.info(`${funcName} ${gameId}: ${message}`, {
         uid,
         gameId,
@@ -42,8 +42,8 @@ export const startGameFunction = functions
     });
 
     const shuffledCards = shuffle(cards);
-    if (playerIds.length === 2) {
-      shuffledCards.splice(26);
+    if (playerIds.length < 4) {
+      shuffledCards.splice(playerIds.length * 13);
     }
 
     let playerIndex = 0;

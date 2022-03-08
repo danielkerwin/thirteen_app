@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constants/game.constants.dart';
@@ -14,10 +15,22 @@ import '../models/user_data.model.dart';
 typedef DocSnapshot = DocumentSnapshot<Map<String, dynamic>>;
 typedef ColSnapshot = QuerySnapshot<Map<String, dynamic>>;
 
-class DatabaseService {
+class DatabaseService with ChangeNotifier {
   final String userId;
+  GameFilters? _gameFilters = GameFilters.active;
 
-  DatabaseService({required this.userId});
+  DatabaseService({
+    required this.userId,
+  });
+
+  set gameFilters(GameFilters? filter) {
+    _gameFilters = filter;
+    notifyListeners();
+  }
+
+  GameFilters? get gameFilters {
+    return _gameFilters;
+  }
 
   Future<UserData> getUserFuture() async {
     final snapshot =
@@ -114,9 +127,13 @@ class DatabaseService {
   }
 
   Stream<List<Game>> getGamesStream() {
+    final status = _gameFilters!.index == GameFilters.active.index
+        ? [GameStatus.created.index, GameStatus.active.index]
+        : [GameStatus.complete.index];
     return FirebaseFirestore.instance
         .collection('games')
         .where('playerIds', arrayContains: userId)
+        .where('status', whereIn: status)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {

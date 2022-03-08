@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/database.service.dart';
 import 'auth.provider.dart';
 
-final databaseProvider = Provider.autoDispose<DatabaseService?>(
+final databaseProvider = ChangeNotifierProvider.autoDispose<DatabaseService?>(
   (ref) {
     final auth = ref.watch(authStateChangesProvider);
     if (auth.value?.uid != null) {

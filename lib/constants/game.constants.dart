@@ -15,6 +15,11 @@ enum GameCardSuit {
   heart,
 }
 
+enum GameFilters {
+  active,
+  complete,
+}
+
 extension GameCardSuitExtension on GameCardSuit {
   String get name => describeEnum(this);
 

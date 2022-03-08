@@ -14,6 +14,31 @@ import '../widgets/main/loading.dart';
 class GamesScreen extends ConsumerWidget {
   const GamesScreen({Key? key}) : super(key: key);
 
+  Future<bool?> _showDeleteConfirmation(
+    BuildContext context,
+    String gameId,
+  ) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete game $gameId?'),
+        content: const Text(
+          'Are you sure? This will remove the game for all players and cannot be undone.',
+        ),
+        actions: [
+          ElevatedButton(
+            child: const Text('Confirm delete'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(false),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -72,7 +97,9 @@ class GamesScreen extends ConsumerWidget {
                   child: ListView.builder(
                     itemCount: games.length,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 4.0, vertical: 8.0),
+                      horizontal: 4.0,
+                      vertical: 8.0,
+                    ),
                     itemBuilder: (ctx, idx) {
                       final game = games[idx];
 
@@ -86,6 +113,9 @@ class GamesScreen extends ConsumerWidget {
                           direction: DismissDirection.endToStart,
                           onDismissed: (direction) {
                             ref.read(databaseProvider)!.deleteGame(game.id);
+                          },
+                          confirmDismiss: (direction) {
+                            return _showDeleteConfirmation(context, game.id);
                           },
                           background: Container(
                             decoration: const BoxDecoration(

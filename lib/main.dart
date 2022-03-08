@@ -11,6 +11,7 @@ import 'providers/auth.provider.dart';
 import 'providers/providers.dart';
 import 'providers/shared_pref.provider.dart';
 import 'providers/user_data.provider.dart';
+import 'screens/about.screen.dart';
 import 'screens/auth.screen.dart';
 import 'screens/create_game.screen.dart';
 import 'screens/game.screen.dart';
@@ -73,6 +74,7 @@ class MyApp extends ConsumerWidget {
           home: auth == null ? const AuthScreen() : const TabsScreen(),
           routes: {
             CreateGameScreen.routeName: (ctx) => const CreateGameScreen(),
+            AboutScreen.routeName: (ctx) => const AboutScreen(),
           },
           onGenerateRoute: (settings) {
             final uri = Uri.parse(settings.name!);

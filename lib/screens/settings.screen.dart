@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/database.provider.dart';
 import '../providers/user_data.provider.dart';
 import '../widgets/main/loading.dart';
+import 'about.screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   static const routeName = '/settings';
@@ -26,7 +27,12 @@ class SettingsScreen extends ConsumerWidget {
             value: user.isDarkMode,
             title: const Text('Toggle Dark Mode'),
           ),
-          OutlinedButton(
+          ListTile(
+            title: const Text('About'),
+            onTap: () => Navigator.of(context).pushNamed(AboutScreen.routeName),
+          ),
+          const Divider(),
+          TextButton(
             onPressed: FirebaseAuth.instance.signOut,
             child: const Text('Sign out'),
           )

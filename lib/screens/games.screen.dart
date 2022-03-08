@@ -52,8 +52,7 @@ class GamesScreen extends ConsumerWidget {
           filters: gameFilter.gameFilter,
         ),
         gamesAsync.when(
-          error: (err, stack) =>
-              const Expanded(child: Center(child: Text('Error'))),
+          error: (err, stack) => const Center(child: Text('Error')),
           loading: () => const Expanded(child: Loading()),
           data: (games) => games.isEmpty
               ? Expanded(

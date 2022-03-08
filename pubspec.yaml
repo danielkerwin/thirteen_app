@@ -3,7 +3,7 @@ description: Thirteen card game
 
 publish_to: "none"
 
-version: 0.0.1+1
+version: 0.0.1+3
 
 environment:
   sdk: ">=2.16.1 <3.0.0"

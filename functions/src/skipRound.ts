@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as helpers from './helpers';
+import { GameStatus } from './interfaces';
 
 const funcName = 'skipRound';
 
@@ -10,6 +11,15 @@ export const skipRoundFunction = functions
     const uid = context.auth?.uid ?? 'unknown';
     const gameId = data.gameId;
     const gameData = await helpers.getGameData(funcName, gameId, context);
+
+    if (gameData.status !== GameStatus.active) {
+      const message = 'Game is not active';
+      functions.logger.info(`${funcName} ${gameId}: ${message}`, {
+        uid,
+        gameId,
+      });
+      throw new functions.https.HttpsError('invalid-argument', message);
+    }
 
     if (gameData.activePlayerId !== uid) {
       const message = 'Not the active player';

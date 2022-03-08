@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { Card, Move, PlayerData } from './interfaces';
+import { Card, GameStatus, Move, PlayerData } from './interfaces';
 import * as helpers from './helpers';
 
 const funcName = 'playHand';
@@ -11,6 +11,15 @@ export const playHandFunction = functions
     const uid = context.auth?.uid ?? 'unknown';
     const gameId = data.gameId;
     const gameData = await helpers.getGameData(funcName, gameId, context);
+
+    if (gameData.status !== GameStatus.active) {
+      const message = 'Game is not active';
+      functions.logger.info(`${funcName} ${gameId}: ${message}`, {
+        uid,
+        gameId,
+      });
+      throw new functions.https.HttpsError('invalid-argument', message);
+    }
 
     if (!gameData || gameData.activePlayerId !== uid) {
       const message = 'Not the active player';

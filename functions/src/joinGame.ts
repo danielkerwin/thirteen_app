@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as helpers from './helpers';
-import { PlayerInfo } from './interfaces';
+import { GameStatus, PlayerInfo } from './interfaces';
 
 const funcName = 'playHand';
 
@@ -11,6 +11,15 @@ export const joinGameFunction = functions
     const uid = context.auth?.uid ?? 'unknown';
     const gameId = data.gameId;
     const gameData = await helpers.getGameData(funcName, gameId, context);
+
+    if (gameData.status !== GameStatus.created) {
+      const message = 'Game has already started';
+      functions.logger.info(`${funcName} ${gameId}: ${message}`, {
+        uid,
+        gameId,
+      });
+      throw new functions.https.HttpsError('invalid-argument', message);
+    }
 
     const playerIds: string[] = gameData?.playerIds ?? [];
 

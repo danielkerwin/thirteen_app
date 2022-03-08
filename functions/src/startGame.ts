@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import * as helpers from './helpers';
 import { cards } from './constants';
 import { shuffle } from 'lodash';
-import { Card } from './interfaces';
+import { Card, GameStatus } from './interfaces';
 
 const funcName = 'startGame';
 
@@ -13,6 +13,15 @@ export const startGameFunction = functions
     const uid = context.auth?.uid ?? 'unknown';
     const gameId = data.gameId;
     const gameData = await helpers.getGameData(funcName, gameId, context);
+
+    if (gameData.status !== GameStatus.created) {
+      const message = 'Game has already started';
+      functions.logger.info(`${funcName} ${gameId}: ${message}`, {
+        uid,
+        gameId,
+      });
+      throw new functions.https.HttpsError('invalid-argument', message);
+    }
 
     const playerIds: string[] = gameData?.playerIds ?? [];
 

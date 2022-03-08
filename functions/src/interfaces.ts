@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin';
+import { firestore } from 'firebase-admin';
 
 export enum GameStatus {
   created,
@@ -43,4 +44,14 @@ export interface GameData {
   round: number;
   lowestCardId: string;
   turn: number;
+}
+
+export interface GameScores {
+  gamesPlayed: firestore.FieldValue;
+  gamesWon?: firestore.FieldValue;
+  ranks: {
+    [players: number]: {
+      [position: number]: firestore.FieldValue;
+    };
+  };
 }

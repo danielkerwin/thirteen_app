@@ -59,6 +59,8 @@ class _AuthFormState extends State<AuthForm> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
+                    textInputAction: TextInputAction.next,
+                    autofillHints: const [AutofillHints.email],
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
@@ -76,6 +78,8 @@ class _AuthFormState extends State<AuthForm> {
                   ),
                   if (!_isLogin)
                     TextFormField(
+                      textInputAction: TextInputAction.next,
+                      autofillHints: const [AutofillHints.nickname],
                       controller: _nicknameController,
                       decoration: const InputDecoration(
                         labelText: 'Nickname',
@@ -91,6 +95,10 @@ class _AuthFormState extends State<AuthForm> {
                       },
                     ),
                   TextFormField(
+                    textInputAction:
+                        _isLogin ? TextInputAction.go : TextInputAction.next,
+                    onFieldSubmitted: (val) => _trySubmit(),
+                    autofillHints: const [AutofillHints.password],
                     controller: _passwordController,
                     obscureText: true,
                     decoration: const InputDecoration(
@@ -108,6 +116,9 @@ class _AuthFormState extends State<AuthForm> {
                   ),
                   if (!_isLogin)
                     TextFormField(
+                      textInputAction: TextInputAction.go,
+                      onFieldSubmitted: (val) => _trySubmit(),
+                      autofillHints: const [AutofillHints.newPassword],
                       controller: _passwordConfirmController,
                       obscureText: true,
                       decoration: const InputDecoration(

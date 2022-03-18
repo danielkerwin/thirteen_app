@@ -26,12 +26,14 @@ class GameFilter extends ConsumerWidget {
       child: Row(
         children: [
           Radio<GameFilters>(
+            key: const ValueKey(GameFilters.active),
             value: GameFilters.active,
             groupValue: filters,
             onChanged: (val) => _setFilter(ref, val!),
           ),
           const Text('Active games'),
           Radio<GameFilters>(
+            key: const ValueKey(GameFilters.complete),
             value: GameFilters.complete,
             groupValue: filters,
             onChanged: (val) => _setFilter(ref, val!),

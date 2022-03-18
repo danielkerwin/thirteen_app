@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
-export const updateScoresFunction = functions
+export const deleteGameFunction = functions
   .region('australia-southeast1')
   .firestore.document('/games/{gameId}')
   .onDelete(async (game) => {
